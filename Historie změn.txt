@@ -1,0 +1,12 @@
+Tisk dat rovnou do cílového souboru v prùbìhu testu
+Plnì odstranìn soubor tmp.txt
+Ochrana proti odpojení sériové linky
+Zavedení direkce pro øízení komunikace
+Zmìnìno grafické rozhraní (tabulka výsledkù, stav testu, mezivýsledek)
+Upravena kalibrace
+
+Odpojení COM portu
+Protokol v PDF
+
+Finální poèty testù
+Logování chyb do souboru namísto vyskakovacích oken

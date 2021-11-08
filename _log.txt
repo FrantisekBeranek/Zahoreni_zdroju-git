@@ -1,0 +1,34 @@
+11:47:33 29.10.2021	Pøerušení spojení
+11:47:34 29.10.2021	Obnovení spojení
+11:47:35 29.10.2021	Pøerušení spojení
+11:48:34 29.10.2021	Obnovení spojení
+11:48:35 29.10.2021	Pøerušení spojení
+11:49:34 29.10.2021	Obnovení spojení
+11:49:35 29.10.2021	Pøerušení spojení
+11:50:34 29.10.2021	Obnovení spojení
+11:50:35 29.10.2021	Pøerušení spojení
+11:51:33 29.10.2021	Obnovení spojení
+11:51:35 29.10.2021	Pøerušení spojení
+11:52:33 29.10.2021	Obnovení spojení
+11:52:34 29.10.2021	Pøerušení spojení
+11:53:33 29.10.2021	Obnovení spojení
+11:53:34 29.10.2021	Pøerušení spojení
+11:54:33 29.10.2021	Obnovení spojení
+11:54:34 29.10.2021	Pøerušení spojení
+11:55:33 29.10.2021	Obnovení spojení
+11:55:34 29.10.2021	Pøerušení spojení
+11:56:32 29.10.2021	Obnovení spojení
+11:56:34 29.10.2021	Pøerušení spojení
+11:57:32 29.10.2021	Obnovení spojení
+11:57:33 29.10.2021	Pøerušení spojení
+11:58:32 29.10.2021	Obnovení spojení
+11:58:32	29.10.2021	!!!Ztráta dat 10!!!
+11:58:32	29.10.2021	!!!Neúplný datový øetìzec 11!!!
+11:58:33 29.10.2021	Pøerušení spojení
+11:59:32 29.10.2021	Obnovení spojení
+11:59:32	29.10.2021	!!!Neúplný datový øetìzec 12!!!
+11:59:33 29.10.2021	Pøerušení spojení
+12:00:32 29.10.2021	Obnovení spojení
+12:00:33 29.10.2021	Pøerušení spojení
+16:44:29 29.10.2021	Pøerušení spojení
+16:44:29 29.10.2021	Obnovení spojení
