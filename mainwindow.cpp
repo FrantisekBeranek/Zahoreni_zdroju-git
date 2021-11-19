@@ -27,7 +27,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->menuN_stroje, SIGNAL(triggered(QAction*)), this, SLOT(toolManage(QAction*)));
     connect(ui->menuZaho_en, SIGNAL(triggered(QAction*)), this, SLOT(zahoreniManage(QAction*)));
     connect(port, SIGNAL(readyRead()), this, SLOT(read()));
-    connect(port, SIGNAL(commandComplete()), this, SLOT(readCommand()));
 
     //ui->stepBack->setFlat(true);
     //ui->nextStep->setFlat(true);
@@ -53,7 +52,7 @@ MainWindow::~MainWindow()
     if(measureInProgress)
     {
         file->makeProtocol();
-        port->write("c");
+        port->writePaket(CANCEL_PAKET, 0);
     }
     delete port;
     delete file;
@@ -187,12 +186,12 @@ void MainWindow::zahoreniManage(QAction* action){
                             ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": 0"));
                             ui->resultTable->clearContents();
                             if(manualMode)
-                                port->write("m");
+                                port->writePaket(MANUAL_PAKET, 0);
                             else
                             {
-                                port->write("s");
+                                port->writePaket(START_PAKET, 0);
                                 startTimer = new QTimer;
-                                startTimer->setInterval(1000);
+                                startTimer->setInterval(2000);
                                 startTimer->setSingleShot(true);
                                 connect(startTimer, SIGNAL(timeout()), this, SLOT(startError()));
                                 startTimer->start();
@@ -215,7 +214,7 @@ void MainWindow::zahoreniManage(QAction* action){
                     QMessageBox::Cancel);
             if(ret == QMessageBox::Ok){
                 ui->testPhase->setText("Fáze testu: Test přerušen");
-                port->write("c");
+                port->writePaket(CANCEL_PAKET, 0);
                 endMeasure();
             }
         }
@@ -280,7 +279,7 @@ void MainWindow::toolManage(QAction* action){
         else if(action->text() == "Kalibrace"){
             if(QMessageBox::information(nullptr, "Kalibrace", "Připojte a zapněte zdroj", 
                     QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok){
-                port->write("k");
+                port->writePaket(CALIB_PAKET, 0);
                 calibInProgress = true;
                 timer->setInterval(5000);
                 timer->setSingleShot(true);
@@ -296,9 +295,51 @@ void MainWindow::toolManage(QAction* action){
     }
 }
 
+//_____Funkce pro zpracování paketu_____//
+void MainWindow::managePaket(Paket* paket)
+{
+    switch (paket->type)
+    {
+    case DATA_PAKET:
+        dataManage(paket->data, paket->dataLength);
+        break;
+
+    case DATA_BAT_PAKET:
+        dataBatManage(paket->data, paket->dataLength);
+        break;
+    
+    case TEST_NUM_PAKET:
+        testNumManage(*(paket->data));
+        break;
+
+    case TEST_PHASE_PAKET:
+        testPhaseManage(*(paket->data));
+        break;
+
+    case ACK_PAKET:
+        /* code */
+        break;
+
+    case REFRESH_PAKET:
+        /* code */
+        break;
+    
+    default:
+        break;
+    }
+
+    //___Uvolni alokovanou paměť___//
+    free(paket->data);
+    free(paket);
+}
+
 void MainWindow::read(){
     //---Přečtení dat---//
-    QString message = port->readData();
+    Paket* data = port->readData();
+    if(data != nullptr)
+    {
+        managePaket(data);
+    }
 
     //---Ošetření varování chyby spojení---//
     serialTimer->stop();
@@ -307,82 +348,11 @@ void MainWindow::read(){
     ui->COMconnected->setText("COM: PŘIPOJENO");
     ui->COMconnected->setStyleSheet("QLabel { color: white; background: green; font-size: 16px;}");
 
-    //---Zapis hodnoty do protokolu---//
-    if(!message.isEmpty()){
-        std::vector<QString> values = file->makeArray(message, commandNum);
-        if(!values.size() && (commandNum == 0))
-        {
-            QMessageBox::warning(this, tr("Zahořování zdrojů"), 
-            QString("Některé hodnoty chybí, nebo jsou nulové.\nZkontrolujte připojení zdroje."), QMessageBox::Cancel);
-            file->writeLog(UNCOMPLETE_DATA, commandNum);
-        }
-        else if(!values.size())
-        {
-            if(measureInProgress)
-            {
-                errorCount++;
-                file->writeLog(UNCOMPLETE_DATA, commandNum);
-                ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": ").append(QString::number(errorCount)));
-            }
-        }
-        else if(calibInProgress)
-        {       
-            timer->stop();
-            disconnect(timer, SIGNAL(timeout()), this, SLOT(calibrationFailure()));
-            file->calibration(values);
-        }
-        else
-        {
-            values = file->makeValues(values);
-            if(!(file->writeToFile(values, commandLetter, commandNum)))
-            {
-                errorCount++;
-            }
-            if(values.size() == 1)
-            {
-                QTableWidgetItem* cell = new QTableWidgetItem(values.at(0));
-                cell->setFlags(cell->flags() ^ Qt::ItemIsEditable);
-                ui->resultTable->setItem(commandNum, 0, cell);
-                for (unsigned int i = 1; i < MEAS_TYPES_COUNT; i++)
-                {
-                    QTableWidgetItem* cell = new QTableWidgetItem("-");
-                    cell->setFlags(cell->flags() ^ Qt::ItemIsEditable);
-                    ui->resultTable->setItem(commandNum, i, cell);
-                }
-                
-            } 
-            else if(values.size() == MEAS_TYPES_COUNT)
-            {
-                for (unsigned int i = 0; i < values.size(); i++)
-                {
-                    QTableWidgetItem* cell = new QTableWidgetItem(values.at(i));
-                    cell->setFlags(cell->flags() ^ Qt::ItemIsEditable);
-                    ui->resultTable->setItem(commandNum, i, cell);
-                } 
-            }
-            else
-            {
-                //QMessageBox::warning(this, "Chyba přenosu", "Data nemají požadované parametry", QMessageBox::Ok);
-                for (unsigned int i = 0; i < values.size(); i++)
-                {
-                    QTableWidgetItem* cell = new QTableWidgetItem(values.at(i));
-                    cell->setFlags(cell->flags() ^ Qt::ItemIsEditable);
-                    ui->resultTable->setItem(commandNum, i, cell);
-                } 
-                if(measureInProgress)
-                {
-                    errorCount++;
-                    file->writeLog(UNCOMPLETE_DATA, commandNum);
-                    ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": ").append(QString::number(errorCount)));
-                }
-            }
-
-            if(file->testResult)
-                ui->actualResult->setText("Průběžný výsledek: Ano");
-            else
-                ui->actualResult->setText("Průběžný výsledek: Ne");
-            
-        }   
+    if(comError){
+        comError = false;
+        //QMessageBox::information(this, tr("Komunikace"), tr("Spojení s přípravkem obnoveno"), QMessageBox::Ok);
+        if(measureInProgress)
+            file->writeLog(COM_RECONNECTION);
     }
 
 }
@@ -413,87 +383,144 @@ void MainWindow::endCalibration(){
     calibInProgress = false;
 }
 
-void MainWindow::readCommand(){
-    while(port->command.size()){
-        unsigned char commandChar = port->command.dequeue();
+void MainWindow::testNumManage(char num)
+{
+    commandNum = num;
         
-        //---Ošetření upozornění o chybě přenosu---//
-        serialTimer->stop();
-        serialTimer->setInterval(1100);
-        serialTimer->start();
-        if(comError){
-            comError = false;
-            //QMessageBox::information(this, tr("Komunikace"), tr("Spojení s přípravkem obnoveno"), QMessageBox::Ok);
-            if(measureInProgress)
-                file->writeLog(COM_RECONNECTION);
+    if(commandNum != lastNum)
+    {
+        if(measureInProgress)
+        {
+            errorCount++;
+            file->writeLog(DATA_LOSS, lastNum);
+            ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": ").append(QString::number(errorCount)));
         }
+        lastNum = commandNum;
+    }
+    lastNum++;
+}
 
-        if(commandChar > 65){
-            commandLetter = commandChar;
-            //ui->statusbar->showMessage(QString("Command %1 %2").arg(commandLetter).arg(commandNum + 48));
-            //statusBarTimer->start();
-            
-            switch (commandLetter)
-            {
-            case 'e':   //Konec testu
-                endTimer->start();
-                ui->testPhase->setText("Fáze testu: Test ukončen");
-                break;
+void MainWindow::testPhaseManage(char phase)
+{
+    commandLetter = phase;
+    //ui->statusbar->showMessage(QString("Command %1 %2").arg(commandLetter).arg(commandNum + 48));
+    //statusBarTimer->start();
+    
+    switch (commandLetter)
+    {
+    case 'e':   //Konec testu
+        endTimer->start();
+        ui->testPhase->setText("Fáze testu: Test ukončen");
+        break;
 
-            case 's':   //Začátek testu
-                ui->testPhase->setText("Fáze testu: Spouštění");
-                if(startTimer != nullptr)
-                {
-                    startTimer->stop();
-                    delete startTimer;
-                    startTimer = nullptr;
-                }
-                break;
+    case 's':   //Začátek testu
+        ui->testPhase->setText("Fáze testu: Spouštění");
+        if(startTimer != nullptr)
+        {
+            startTimer->stop();
+            delete startTimer;
+            startTimer = nullptr;
+        }
+        break;
 
-            case 'm':   //Hlavní test
-                ui->testPhase->setText("Fáze testu: Hlavní test v průběhu");
-                break;
+    case 'm':   //Hlavní test
+        ui->testPhase->setText("Fáze testu: Hlavní test v průběhu");
+        break;
 
-            case 'b':   //Baterie start
-                ui->testPhase->setText("Fáze testu: Spouštění měření baterie");
-                break;
+    case 'b':   //Baterie start
+        ui->testPhase->setText("Fáze testu: Spouštění měření baterie");
+        break;
 
-            case 'M':   //Hlavní test baterie
-                ui->testPhase->setText("Fáze testu: Hlavní test baterie v průběhu");
-                break;
-                
-            default:
-                break;
-            }
+    case 'M':   //Hlavní test baterie
+        ui->testPhase->setText("Fáze testu: Hlavní test baterie v průběhu");
+        break;
+        
+    default:
+        break;
+    }
+}
+
+void MainWindow::dataManage(char* data, char dataLength)
+{
+    if(dataLength == 2*MEAS_TYPES_COUNT)
+    {
+        unsigned int values[MEAS_TYPES_COUNT] = {0};
+        for (int i = 0; i < MEAS_TYPES_COUNT; i++)
+        {
+            values[i] |= ((data[2*i] << 8) & 0xFF00);
+            values[i] |= (data[2*i + 1] & 0xFF);
+        }
+        if(calibInProgress)
+        {
+            timer->stop();
+            disconnect(timer, SIGNAL(timeout()), this, SLOT(calibrationFailure()));
+            file->calibration(values);
         }
         else
         {
-            commandNum = commandChar;
-        
-            if(commandNum != lastNum)
+            float result[MEAS_TYPES_COUNT];
+            file->makeValues(values, result);
+            if(!(file->writeToFile(result, commandLetter, commandNum)))
             {
-                /*if(QMessageBox::critical(this, "Chyba přenosu",
-                QString("Během měření došlo ke ztrátě dat.\n Přejete si přesto měření dokončit?"),
-                QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel)
-                {   //Obsluha nechce dále pokračovat v testu
-                    file->removeAll();
-                    measureInProgress = false;
-                    port->write("c");
-                    errorCount = 0;
-                    warningCount = 0;
-                    return;
-                }*/
-                if(measureInProgress)
-                {
-                    errorCount++;
-                    file->writeLog(DATA_LOSS, lastNum);
-                    ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": ").append(QString::number(errorCount)));
-                }
-                lastNum = commandNum;
+                errorCount++;
             }
-            lastNum++;
+            for (unsigned int i = 0; i < MEAS_TYPES_COUNT; i++)
+            {
+                QString num = QString::number(result[i], 10, 2);
+                QTableWidgetItem* cell = new QTableWidgetItem(num);
+                cell->setFlags(cell->flags() ^ Qt::ItemIsEditable);
+                ui->resultTable->setItem(commandNum, i, cell);
+            }
+            if(file->testResult)
+                ui->actualResult->setText("Průběžný výsledek: Ano");
+            else
+                ui->actualResult->setText("Průběžný výsledek: Ne");
         }
-        
+
+    }
+    else if(commandNum == 0)
+    {
+        QMessageBox::warning(this, tr("Zahořování zdrojů"), 
+        QString("Některé hodnoty chybí, nebo jsou nulové.\nZkontrolujte připojení zdroje."), QMessageBox::Cancel);
+        file->writeLog(UNCOMPLETE_DATA, commandNum);
+    }
+    else
+    {
+        file->writeLog(UNCOMPLETE_DATA, commandNum);
+        return;
+    }
+}
+
+void MainWindow::dataBatManage(char* data, char dataLength)
+{
+    if(dataLength == 2)
+    {
+        unsigned int values[MEAS_TYPES_COUNT] = {0};
+        values[4] = (data[0] << 8) + data[1];
+
+        float result[MEAS_TYPES_COUNT];
+        file->makeValues(values, result);
+        if(!(file->writeToFile(result, commandLetter, commandNum)))
+        {
+            errorCount++;
+        }
+        for (unsigned int i = 0; i < MEAS_TYPES_COUNT; i++)
+        {
+            QString num = QString::number(result[i], 10, 2);
+            QTableWidgetItem* cell = new QTableWidgetItem(num);
+            cell->setFlags(cell->flags() ^ Qt::ItemIsEditable);
+            ui->resultTable->setItem(commandNum, i, cell);
+        }
+        if(file->testResult)
+            ui->actualResult->setText("Průběžný výsledek: Ano");
+        else
+            ui->actualResult->setText("Průběžný výsledek: Ne");
+
+    }
+    else
+    {
+        file->writeLog(UNCOMPLETE_DATA, commandNum);
+        return;
     }
 }
 
@@ -502,7 +529,7 @@ void MainWindow::startError(){
     "Spuštění se nezdařilo.\nPřejete si opakovat spuštění?",
     QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
     {
-        port->write("s");
+        port->writePaket(START_PAKET, 0);
         startTimer->setInterval(1000);
         startTimer->start();
     }
@@ -511,6 +538,7 @@ void MainWindow::startError(){
         measureInProgress = false;
         startTimer->stop();
         delete startTimer;
+        startTimer = nullptr;
         file->removeAll();
     }
 }

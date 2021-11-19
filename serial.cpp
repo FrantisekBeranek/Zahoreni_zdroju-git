@@ -86,47 +86,56 @@ QList<QString> Serial::getComs()
     return ports;
 }
 
-QString Serial::readData()
+Paket* Serial::readData()
 {
-    QString tmp;
+    char inChar;
 
+    //___Načti všechny příchozí znaky do bufferu___//
     while(read(&inChar, 1) == 1)
     {
-        switch (inChar)
-        {
-            case '#':
-                commandChar = true;
-                break;
-            
-            case '\n':
-                if(commandChar == true)
-                {
-                    commandChar = false;
-                    emit commandComplete();
-                    break;
-                }
-                else
-                {
-                    buffer.append(inChar);
-                    tmp = buffer;
-                    buffer.clear();
-                }
-            
-            default:
-                if(commandChar == true)
-                {
-                    if(inChar == 126)
-                        inChar = 10;
-                    command.enqueue(inChar);
-                    break;
-                }
-                else
-                {
-                    buffer.append(inChar);
-                    break;
-                }
-        }
-        
+        buffer.enqueue(inChar);
     }
-    return tmp;
+
+    for (int i = 0; i < buffer.length()-MINIMUM_PAKET_SIZE; i++)
+    {
+        if(buffer.at(i) == '>' && buffer.at(i+1) == '>')    //Počátek paketu
+        {
+            for (int y = i; y < buffer.length()-2; y++)
+            {
+                if(buffer.at(y) == '<' && buffer.at(y+1) == '<' && buffer.at(y+2) == '\n')    //Konec paketu
+                {
+                    Paket* inPaket = (Paket*)malloc(sizeof(Paket));
+                    inPaket->type = buffer.at(i+2);
+                    inPaket->CA_value = buffer.at(y-1);
+                    inPaket->dataLength = y-i-4;    
+                    char* data = (char*)malloc((inPaket->dataLength)*sizeof(char));
+                    for (int x = 0; x < inPaket->dataLength; x++)
+                    {
+                        data[x] = buffer.at(x+i+3);
+                    }
+                    inPaket->data = data;
+
+                    QTextStream out(stdout);
+                    //vymazání přijatého paketu z bufferu
+                    for (int x = 0; x < y+2; x++)
+                    {
+                        char tmp = buffer.dequeue();
+                        out << tmp;
+                    }
+                    out << endl;
+                    
+                    return inPaket;
+                }
+            }
+            
+        }
+    }
+
+    return nullptr;
+}
+
+int Serial::writePaket(outPaketType paketType, int sourcePointer = 0)
+{
+    char paket[8] = {'>', '>', paketType, sourcePointer, paketType+sourcePointer, '<', '<', '\n'};
+    return this->write(paket, 8);
 }

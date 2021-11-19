@@ -49,6 +49,13 @@ private:
     QTimer* statusBarTimer;
     QTimer* serialTimer;
 
+    void managePaket(Paket* paket);
+    void testNumManage(char num);
+    void testPhaseManage(char phase);
+    void dataManage(char* data, char dataLength);
+    void dataBatManage(char* data, char dataLength);
+
+
 
 public slots:
     //void powerManage();
@@ -59,7 +66,6 @@ public slots:
     void read();
     void calibrationFailure();
     void endCalibration();
-    void readCommand();
     void endMeasure();
     void serialError();
     void startError();

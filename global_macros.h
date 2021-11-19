@@ -1,6 +1,8 @@
 #ifndef GLOBAL_MACROS
 #define GLOBAL_MACROS
 
+//#define QT_NO_DEBUG_OUTPUT
+
 //---Počet měřených veličin---//
 #define MEAS_TYPES_COUNT 7
 //#define FINAL
