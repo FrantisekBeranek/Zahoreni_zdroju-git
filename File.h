@@ -83,12 +83,12 @@ public:
     QString getPath();  //dialogovým oknem zjistí adresu a název nového souboru
     int createFile(QString);   //vytvoří nový soubor a překopíruje do něj šablonu
     std::vector<QString> makeArray(QString, int);
-    std::vector<QString> makeValues(std::vector<QString>);
-    bool writeToFile(std::vector<QString>, unsigned char, unsigned char);
+    bool makeValues(unsigned int*, float*);
+    bool writeToFile(float*, unsigned char, unsigned char);
     bool limitsCheck();
     bool limitsSetup();
     int makeProtocol();
-    void calibration(std::vector<QString>);
+    void calibration(unsigned int*);
     void writeLog(errorLogs, int);
     void writeLog(errorLogs);
     void showLog();

@@ -164,22 +164,19 @@ std::vector<QString> File::makeArray(QString message, int testNum)
     return values;
 }
 
-std::vector<QString> File::makeValues(std::vector<QString> valuesADC)
+bool File::makeValues(unsigned int* valuesADC, float* valuesFloat)
 {
-    std::vector<QString> values;
+    if(!getConstants())
+        return false;
     for (int i = 0; i < MEAS_TYPES_COUNT; i++)
     {
-        getConstants();
-        double voltage = valuesADC.at(i).toDouble()*transfer[i];
-        int prec = (voltage >= 10)? 4 : 3;
-        QString val = (voltage == 0)? "-" : QString::number(voltage, 'g', prec);
-        values.push_back(val);
+        valuesFloat[i] = valuesADC[i] * transfer[i];
     }
     
-    return values;
+    return true;
 }
 
-bool File::writeToFile(std::vector<QString> values, unsigned char testType, unsigned char testNum)
+bool File::writeToFile(float* values, unsigned char testType, unsigned char testNum)
 {
     static bool bat = false;
     unsigned int retVal = 0;
@@ -267,6 +264,8 @@ bool File::writeToFile(std::vector<QString> values, unsigned char testType, unsi
             }
             
             double max, min;
+            QString numString;
+            numString = QString::number(values[i], 10, 2);
             if(testNum == 0){
                 //---První měření, tj. zdroj naprázdno---//
                 max = limitsLine.section(';', 0, 0).toDouble();
@@ -278,30 +277,29 @@ bool File::writeToFile(std::vector<QString> values, unsigned char testType, unsi
                 max = limitsLine.section(';', 2, 2).toDouble();
                 min = limitsLine.section(';', 3, 3).toDouble();
             }
-            double voltage = values.at(i).toDouble();
             //---Vyhodnoť a převeď data---//
-            if((voltage < min || voltage > max) && bat == false){
+            if((values[i] < min || values[i] > max) && bat == false){
                 //---Změřená hodnota je mimo dané meze---//
                 testResult = false;
-                values.at(i).append(" -");
+                numString.append(" -");
             }
             else
             {
-                values.at(i).append(" +");
+                numString.append(" +");
             }
                     
                     
-            if(values.at(i).length() > 9){
+            if(numString.length() > 9){
                 //---Zkrať na sedm a přidej ".."---//
-                values.at(i).resize(7);
-                values.at(i).append("..|");
-                out2 << values.at(i);
+                numString.resize(7);
+                numString.append("..|");
+                out2 << numString;
             }
             else
             {
                         
-                out2 << values.at(i);
-                for (int x = 0; x < 9 - values.at(i).length(); x++)
+                out2 << numString;
+                for (int x = 0; x < 9 - numString.length(); x++)
                 {
                     out2 << ' ';
                 }
@@ -530,7 +528,7 @@ limits::~limits()
 }
 
 //=====Kalibrace=====//
-void File::calibration(std::vector<QString> values)
+void File::calibration(unsigned int* values)
 {
     QString voltages[7] = {"5V_Kon", "5V", "12V", "15V", "U_bat", "24V", "24V_O2"};
     double voltagesNum[7] = {5, 5, 12, 15, 8, 24, 24};
@@ -544,12 +542,11 @@ void File::calibration(std::vector<QString> values)
         for (int i = 0; i < 7; i++)
         {
             voltages[i].prepend("Změřte napětí ");
-            double value = QInputDialog::getDouble(nullptr, "Kalibrace", 
+            double refValue = QInputDialog::getDouble(nullptr, "Kalibrace", 
                     voltages[i], voltagesNum[i], voltagesNum[i] - 2, voltagesNum[i] + 2, 1, &Ok);
             if(Ok){
                 //Přepočti na konstantu
-                QString meas = values.at(i);
-                double constant = value/meas.toDouble();
+                double constant = refValue/values[i];
                 out << constant << ';';
             }
             else
