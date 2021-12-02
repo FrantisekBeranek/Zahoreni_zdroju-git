@@ -1,6 +1,7 @@
 #include "File.h"
 #include "ui_limits.h"
 
+//_____Konstruktor_____//
 File::File()
 {
     //---Nastavení cesty k souboru meze podle domovského adresáře---//
@@ -19,7 +20,8 @@ File::File()
         
     }
     limitsPath = limitsFile.fileName();
-    
+
+    //___Úprava zbylých cest___//
     defaultPath.prepend(homePath1);
     calibPath.prepend(homePath1);
     patternPath.prepend(homePath1);
@@ -27,26 +29,33 @@ File::File()
     logFile = new QFile;
 }
 
+//_____Destruktor_____//
 File::~File()
 {
     if(this->isOpen())
         this->close();
 }
 
+//_____Dialog při založení nového testu_____//
 QString File::getPath()
 {
-    QString dateStr = QDateTime::currentDateTime().toString("_dd_MM_yy");
+    QString dateStr = QDateTime::currentDateTime().toString("_dd_MM_yy");   //Získání data v daném formátu
     bool Ok;
     serialNumber = QInputDialog::getText(nullptr, "Sériové číslo",
             "Zadejte sériové číslo testovaného zdroje", QLineEdit::Normal, 
-            "Zde zapište sériové číslo", &Ok);
-    if (!Ok)    return nullptr;
+            "Zde zapište sériové číslo", &Ok);  //Zadání sériového čísla zdroje
+    if (!Ok)    return nullptr; //Při neúspěchu ukonči
+
+    //___Nastavení názvu souboru___//
     QString fileName = serialNumber;
     fileName.append(dateStr);
+
     worker = QInputDialog::getText(nullptr, "Jméno pracovníka",
             "Zadejte své jméno", QLineEdit::Normal, 
-            "", &Ok);
-    if (!Ok)    return nullptr;
+            "", &Ok);   //Zadání jména pracovníka
+    if (!Ok)    return nullptr; //Při neúspěchu ukonči
+
+    //___Získání absolutní adresy nového souboru___//
     QFile file;
     file.setFileName(defaultPath);
     if(file.exists()){
@@ -61,18 +70,25 @@ QString File::getPath()
             tr("Vytvořit soubor"), "",
             tr("PDF File (*.pdf);;All Files (*)"));
     }
+
     return fileName;
 }
 
+//_____Vytvoření souboru_____//
 int File::createFile(QString path)
 {
     //-----------------TXT-------------------//
+    //___Nastavení adresy___//
     this->setFileName(path);
     this->path = path;
+
+    //___Překopírování hlavičky ze vzoru___//
     if(!(QFile::copy(this->patternPath, path))){
         QMessageBox::warning(nullptr, tr("Zahořování zdrojů"), tr("Nepodařilo se otevřít soubor %1").arg(path), QMessageBox::Cancel);
         return 0;
     }
+
+    //___Přepsání výchozí adresy pro ukládání protokolů___//
     QString defaultDir = dir.absoluteFilePath(path);
     defaultDir = defaultDir.section('/', 0, -2);
     defaultDir.append("/");
@@ -89,40 +105,11 @@ int File::createFile(QString path)
     doc = new QTextDocument;
     cursor = new QTextCursor(doc);
     cursor->movePosition(QTextCursor::Start);
-    /*QTextCharFormat font;
-    font.setFontPointSize(16000);
-    cursor->insertText(QString("Zahoření Zdroje\n\n"), font);
-    QTextTableFormat format;
-    format.setHeaderRowCount(1);
-    format.setBorderCollapse(true);
-    QVector<QTextLength> lenghtVec;
-    for (int i = 0; i < 8; i++)
-    {
-        QTextLength lenght(QTextLength::FixedLength, 100);
-        lenghtVec.push_back(lenght);
-    }
-    format.setColumnWidthConstraints(lenghtVec);
-    QTextTable* table = cursor->insertTable(6, 8, format);
-    QTextTableCell headerCell;
-    std::vector<QString> headerRow = {"", "5V/1", "5V KON", "12V", "15V", "24V O2", "24V", "U_BAT"};
-    for (int i = 0; i < 8; i++)
-    {
-        headerCell = table->cellAt(0, i);
-        QTextCursor cellCursor = headerCell.firstCursorPosition();
-        cellCursor.insertText(headerRow.at(i));
-    }
-    QPrinter printer(QPrinter::PrinterResolution);
-    printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setPaperSize(QPrinter::A4);
-    printer.setOutputFileName(pathPDF);
-
-    //doc->setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
-    doc->print(&printer);*/
     
-
     return 1;
 }
 
+//_____Načtení převodních konstant_____//
 bool File::getConstants()
 {
     QFile calibFile;
@@ -139,34 +126,10 @@ bool File::getConstants()
     return false;
 }
 
-std::vector<QString> File::makeArray(QString message, int testNum)
-{
-    std::vector<QString> values;
-    if(testNum >= (START_MEAS_COUNT + MAIN_MEAS_COUNT))  //měření baterie
-    {
-        values.resize(MEAS_TYPES_COUNT);
-        values.at(4) = message.section(';', 0, 0);
-    }
-    else
-    {    
-        for (int i = 0; i < MEAS_TYPES_COUNT; i++)
-        {
-            QString val = message.section(';', i, i);
-            if(val.isEmpty() || val == "0") //Hodnota chybí nebo je nulová
-            {
-                std::vector<QString> nullVec;
-                return nullVec;
-            }
-            //QMessageBox::information(nullptr, "Kalibrace", val, QMessageBox::Ok);
-            values.push_back(val);
-        }
-    }
-    return values;
-}
-
+//_____Převod z hodnot ADC na napětí_____//
 bool File::makeValues(unsigned int* valuesADC, float* valuesFloat)
 {
-    if(!getConstants())
+    if(!getConstants()) //Načtení převodních konstant
         return false;
     for (int i = 0; i < MEAS_TYPES_COUNT; i++)
     {
@@ -176,6 +139,7 @@ bool File::makeValues(unsigned int* valuesADC, float* valuesFloat)
     return true;
 }
 
+//_____Zápis dat do souboru_____//
 bool File::writeToFile(float* values, unsigned char testType, unsigned char testNum)
 {
     static bool bat = false;
@@ -208,14 +172,12 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
 
         if(testNum < START_MEAS_COUNT) //Start testu
         {
-            //out2 << "začátek\n";
             testName = "start    ";
             bat = false;
         }
 
         else if(testNum < (START_MEAS_COUNT + MAIN_MEAS_COUNT))   //hlavní test
         {
-            //out2 << "Hlavní test\n";
             if(testNum == START_MEAS_COUNT)   //První měření hlavního testu
             {
                 out2 << divLine;
@@ -226,7 +188,6 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
 
         else if(testNum < (START_MEAS_COUNT + MAIN_MEAS_COUNT + BAT_START_MEAS_COUNT))   //baterie start
         {
-            //out2 << "baterie\n";
             out2 << divLine << '\n' << "Baterie\n";
             testName = "baterie  ";
             bat = true;
@@ -234,12 +195,9 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
         
         else  //test baterie
         {
-            //out2 << "baterie test\n";
             testName = QString("Mereni %1").arg(testNum-(START_MEAS_COUNT + MAIN_MEAS_COUNT + BAT_START_MEAS_COUNT)+1).leftJustified(9, ' ');
             bat = true;
         }
-
-        
 
         if(bat)
         {
@@ -315,6 +273,7 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
         return true;
     }
     else{
+        //---Zapiš log o chybě zápisu---//
         errorLogs err;
         switch(retVal)
         {
@@ -329,10 +288,12 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
                 break;
         }
         writeLog(err);
+
         return false;
     }
 }
 
+//_____Dopíše závěr protokolu a přepíše ho do pdf_____//
 int File::makeProtocol()
 {
     QTextStream out(this);
@@ -345,18 +306,21 @@ int File::makeProtocol()
             this->close();
 
         if(this->open(QIODevice::WriteOnly | QIODevice::Append)){   
+            //___Zapiš výsledek testu___//
             out << divLine  << "\n\n" << "Vysledek: ";
             if(testResult)
                 out << "+";
             else
                 out << "-";
             
+            //___Zapiš pracovníka a datum___//
             out << "\nProvedl: " << worker << "    dne: " << QDateTime::currentDateTime().toString("dd.MM.yyyy");
 
             this->close();
 
             this->open(QIODevice::ReadOnly);
 
+            //___Nastavení formátu pdf___//
             QPrinter printer(QPrinter::PrinterResolution);
             printer.setOutputFormat(QPrinter::PdfFormat);
             printer.setPaperSize(QPrinter::A4);
@@ -365,17 +329,20 @@ int File::makeProtocol()
 
             QTextDocument doc;
 
-            this->seek(0);
+            this->seek(0);  //Nastaví kurzor v txt na začátek
+
+            //___Nastavení fontu pdf___//
             QFont font("Courier", 1);
             font.setFixedPitch(true);
             doc.setDefaultFont(font);
-            doc.setPlainText(QString::fromLatin1(this->readAll()));
 
+            //___Přepsání do pdf___//
+            doc.setPlainText(QString::fromLatin1(this->readAll()));
             doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
             doc.print(&printer);
 
+            //___Zavření a odstranění pomocného txt souboru___//
             this->close();
-
             this->remove();
 
             return 1;
@@ -388,6 +355,7 @@ int File::makeProtocol()
 
 //====Práce s mezemi====//
 
+//_____Kontrola umístění souboru limits___//
 bool File::limitsCheck()
 {
     bool ret;
@@ -398,6 +366,7 @@ bool File::limitsCheck()
     return ret;
 }
 
+//_____Uložení hodnot limit z formuláře do souboru_____//
 void File::saveLimits()
 {
     if(limitsFile.isOpen())
@@ -452,6 +421,7 @@ void File::saveLimits()
     }
 }
 
+//_____Vytvoření formuláře pro nastavení mezních hodnot_____//
 bool File::limitsSetup()
 {
     limitsFile.setFileName(limitsPath);
@@ -462,6 +432,7 @@ bool File::limitsSetup()
     //---Výchozí hodnoty nastav dle existujících hodnot---//
     if(limitsFile.open(QIODevice::ReadOnly))
     {
+        //___Nastavení současných hodnot jako výchozích___//
         double val[MEAS_TYPES_COUNT][4];
         for(int i = 0; i < MEAS_TYPES_COUNT; i++)
         {
@@ -515,6 +486,7 @@ bool File::limitsSetup()
 
 
 //=====Formulář mezí=====//
+//_____Konstruktor_____//
 limits::limits(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::limits)
@@ -522,6 +494,7 @@ limits::limits(QWidget *parent) :
     ui->setupUi(this);
 }
 
+//_____Destruktor_____//
 limits::~limits()
 {
     delete ui;
@@ -533,6 +506,8 @@ void File::calibration(unsigned int* values)
     QString voltages[7] = {"5V_Kon", "5V", "12V", "15V", "U_bat", "24V", "24V_O2"};
     double voltagesNum[7] = {5, 5, 12, 15, 8, 24, 24};
     bool Ok;
+
+    //___Otevření souboru___//
     QFile calibFile;
     calibFile.setFileName(calibPath);
     if(calibFile.open(QIODevice::WriteOnly | QIODevice::Truncate)){
@@ -551,7 +526,7 @@ void File::calibration(unsigned int* values)
             }
             else
             {
-                if (QMessageBox::question(nullptr, "Kalibrace", "Opravdu chtete ukončit kalibraci?",
+                if (QMessageBox::question(nullptr, "Kalibrace", "Opravdu chtete ukončit kalibraci?\nStávající hodnoty budou odstraněny!",
                     QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok){
                         break;
                     }
@@ -681,6 +656,7 @@ void File::writeLog(errorLogs error)
     }
 }
 
+//_____Zobrazení chyb na konci testu_____//
 void File::showLog()
 {
     if(logFile->open(QIODevice::ReadOnly))
@@ -689,6 +665,8 @@ void File::showLog()
         logFile->close();
     }
 }
+
+//====Odstranění všech souborů testu====//
 
 void File::removeAll()
 {
