@@ -1,6 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+/*
+*   V Programu se objevují rozdíly pro manual a auto mód měření. Manuální mód ovšem není v 
+*   novém řešení implementován.
+*/
+
+//_____Konstruktor_____//
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -10,34 +16,31 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->testPhase->setText("Fáze testu: Test nebyl spuštěn");
 
     port = new Serial;
-    port->setBaudRate(QSerialPort::Baud9600);
-    port->setDataBits(QSerialPort::Data8);
 
     file = new File;
-    QString tmp = file->homePath1;
     connect(file, SIGNAL(calibrationOver()), this, SLOT(endCalibration()));
 
+    //___Timer pro automatické mazání zpráv ze statusBar___//
     statusBarTimer = new QTimer;
     statusBarTimer->setSingleShot(true);
     statusBarTimer->setInterval(3000);
     connect(statusBarTimer, SIGNAL(timeout()), ui->statusbar, SLOT(clearMessage()));
 
-    //connect(ui->Power, SIGNAL(clicked()), this, SLOT(powerManage()));
+    //___Propojení signálů a slotů___//
     connect(ui->menuCOM, SIGNAL(aboutToShow()), this, SLOT(getCOMs()));
     connect(ui->menuN_stroje, SIGNAL(triggered(QAction*)), this, SLOT(toolManage(QAction*)));
     connect(ui->menuZaho_en, SIGNAL(triggered(QAction*)), this, SLOT(zahoreniManage(QAction*)));
     connect(port, SIGNAL(readyRead()), this, SLOT(read()));
 
-    //ui->stepBack->setFlat(true);
-    //ui->nextStep->setFlat(true);
-
     timer = new QTimer;
     
+    //___Timer pro drobné zpoždění ukončení testu___//
     endTimer = new QTimer;
     endTimer->setSingleShot(true);
     endTimer->setInterval(500);
     connect(endTimer, SIGNAL(timeout()), this, SLOT(endMeasure()));
 
+    //___Timer pro indikaci chyby připojení portu___//
     serialTimer = new QTimer;
     serialTimer->setSingleShot(true);
     serialTimer->setInterval(3000);
@@ -46,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->COMconnected->setStyleSheet("QLabel { background: red; color: white; font-size: 16px;}");
 }
 
+//_____Destruktor____//
 MainWindow::~MainWindow()
 {
     serialTimer->stop();
@@ -59,18 +63,20 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//___Ukončení testu___//
 void MainWindow::endMeasure()
 {
-    //---Ukončení testu---//
     ui->statusbar->showMessage("Ukončení");
     statusBarTimer->start();
 
     if(!file->makeProtocol()){
+        //___Chyba zápisu do protokolu___//
         QMessageBox::warning(this, "Ukončení testu", QString("Nedošlo k řádnému ukončení testu."),
         QMessageBox::Ok);
     }
     else
     {
+        //___Protokol v pořádku vygenerován___//
         if(errorCount || warningCount){
             if(QMessageBox::information(nullptr, "Ukončení testu",
             QString("Protokol vygenerován\nPočet vážných chyb: %1\nPočet drobných chyb: %2\n\nPřejete si zobrazit log?").arg(errorCount).arg(warningCount),
@@ -86,46 +92,19 @@ void MainWindow::endMeasure()
                 QMessageBox::Ok);
         }   
     }
-            
+
+    //___Výchozí nastavení proměnných___//
     measureInProgress = false;
     errorCount = 0;
     warningCount = 0;
-                
-    /*if(manualMode){
-        ui->stepBack->setFlat(true);
-        ui->nextStep->setFlat(true);
-        disconnect(ui->nextStep, SIGNAL(clicked()), port, SLOT(next()));
-        disconnect(ui->stepBack, SIGNAL(clicked()), port, SLOT(back()));
-    }*/
 
     lastNum = 0;
     commandNum = 0;
-
-
 }
 
-/*void MainWindow::powerManage(){
-    if(ui->Power->isChecked() && port->serialConnected){
-        int ret = QMessageBox::information  (this, tr("Zahořování zdrojů"),
-                                            tr("Opravdu si přejete spustit napájení zdroje?"),
-                                            QMessageBox::Ok | QMessageBox::Cancel);
-        if(ret == QMessageBox::Ok){
-            ui->Power->setChecked(true);
-            ui->statusbar->showMessage("Zapínání napájení");
-            statusBarTimer->start();
-            //---pošli příkaz k zapnutí napájení---//
-        }
-        else
-            ui->Power->setChecked(false);
-    }
-    else if(ui->Power->isChecked()){
-        QMessageBox::warning (this, tr("Zahořování zdrojů"),
-                                tr("Nejprve je nutné připojit port!"));
-        ui->Power->setChecked(false);
-    }
-}*/
-
+//_____Obsloužení menu Zahoření_____//
 void MainWindow::zahoreniManage(QAction* action){
+    //___POžadavek na spuštění testu___//
     if(action->text() == "Spustit"){
         if(measureInProgress){
             QMessageBox::information(this, "Zahoření zdrojů", "Nejdříve ukončete probíhající test", QMessageBox::Ok);
@@ -141,32 +120,13 @@ void MainWindow::zahoreniManage(QAction* action){
                                     tr("Nejdříve nastavte krajní hodnoty pro test"));
                 return;
             }
-            //---Zjistit mod měření---//
-            /*bool Ok;
-            QStringList list;
-            list << "Automatický" << "Manuální";
-            if (QInputDialog::getItem(this, "Režim", "Vyberte režim testu", list, 0, false, &Ok) == "Automatický")
-            {
-                manualMode = false;
-                ui->stepBack->setFlat(true);
-                ui->nextStep->setFlat(true);
-                disconnect(ui->nextStep, SIGNAL(clicked()), port, SLOT(next()));
-                disconnect(ui->stepBack, SIGNAL(clicked()), port, SLOT(back()));
-            }
-            else
-            {
-                manualMode = true;
-                ui->stepBack->setFlat(false);
-                ui->nextStep->setFlat(false);
-                connect(ui->nextStep, SIGNAL(clicked()), port, SLOT(next()));
-                connect(ui->stepBack, SIGNAL(clicked()), port, SLOT(back()));
-            }
-            if(Ok){*/
             
                 //---Zjistit požadovaný název a umístění---//
                 file->pathPDF = file->getPath();
                 QString path = file->pathPDF.section('.', 0, 0);
                 path = path.append(".txt");
+
+                //---Opětovné připojení serialTimeru---//
                 serialTimer->setInterval(1100);
                 serialTimer->start();
                 connect(serialTimer, SIGNAL(timeout()), this, SLOT(serialError()));
@@ -207,6 +167,7 @@ void MainWindow::zahoreniManage(QAction* action){
         }
         
     }
+    //___Požadavek na zastavení testu___//
     else if(action->text() == "Zastavit"){
         if(measureInProgress){
             int ret = QMessageBox::question(this, "Zahořování zdrojů",
@@ -219,18 +180,22 @@ void MainWindow::zahoreniManage(QAction* action){
             }
         }
     }
+    //___Požadavek na nastavení mezí testu___//
     else if(action->text() == "Změnit meze"){
         file->limitsSetup();
     }
 }
 
+//_____Získání dostupných portů_____//
 void MainWindow::getCOMs(){
     ui->menuCOM->clear();
     QList<QString> ports = port->getComs();
     if(ports.count()){
+        //___Výpis postupných portů do menuCom___//
         foreach(QString name, ports){
             ui->menuCOM->addAction(name);
         }
+        //___Přidání akce odpojení portu___//
         ui->menuCOM->addSeparator();
         ui->menuCOM->addAction(ui->actionOdpojit_port);
     }
@@ -239,7 +204,9 @@ void MainWindow::getCOMs(){
     }
 }
 
+//_____Připojení portu_____//
 void MainWindow::connectPort(QAction* action){
+    //___Odpojení portu___//
     if(action->text() == "Odpojit port")
     {
         if(port->serialConnected)
@@ -253,6 +220,7 @@ void MainWindow::connectPort(QAction* action){
             ui->COMconnected->setStyleSheet("QLabel { color: white; background: red; font-size: 16px;}");
         }
     }
+    //___Připojení___//
     else
     {
         if(port->connectPort(action->text()))
@@ -271,24 +239,26 @@ void MainWindow::connectPort(QAction* action){
     }
 }
 
+//_____Obsloužení menu Nástrojů_____//
 void MainWindow::toolManage(QAction* action){
     if(action->text() != "Žádný dostupný port"){
         if(measureInProgress && !comError){
                 QMessageBox::warning(this, "Zahoření zdrojů", "Akci nelze provádět v průběhu měření", QMessageBox::Ok);
         }
+        //___Požadavek na kalibraci___//
         else if(action->text() == "Kalibrace"){
             if(QMessageBox::information(nullptr, "Kalibrace", "Připojte a zapněte zdroj", 
-                    QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok){
+                    QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
+            {
                 port->writePaket(CALIB_PAKET, 0);
                 calibInProgress = true;
                 timer->setInterval(5000);
                 timer->setSingleShot(true);
-                //disconnect(port, SIGNAL(readyRead()), this, SLOT(read()));
                 connect(timer, SIGNAL(timeout()), this, SLOT(calibrationFailure()));
-                //connect(port, SIGNAL(readyRead()), this, SLOT(calibrationStart()));
                 timer->start();
             }
         }
+        //___Připojení portu___//
         else{
             connectPort(action);
         }
@@ -333,8 +303,8 @@ void MainWindow::managePaket(Paket* paket)
     free(paket);
 }
 
+//_____Čtení dat_____//
 void MainWindow::read(){
-    //---Přečtení dat---//
     Paket* data = port->readData();
     if(data != nullptr)
     {
@@ -357,9 +327,8 @@ void MainWindow::read(){
 
 }
 
+//_____Chyba připojení portu (přípravek se neozývá)_____//
 void MainWindow::serialError(){
-    /*QMessageBox::critical(this, "Chyba komunikace", "Došlo k přerušení spojení.\nZkontrolujte připojení přípravku.",
-    QMessageBox::Ok);*/
     if(measureInProgress)
     {
         warningCount++;
@@ -371,6 +340,7 @@ void MainWindow::serialError(){
     ui->COMconnected->setStyleSheet("QLabel { color: white; background: red; font-size: 16px;}");
 }
 
+//_____Chyba kalibrace (vypršel čas)_____//
 void MainWindow::calibrationFailure(){
     timer->stop();
     QMessageBox::warning(this, "Kalibrace", "Zkontrolujte připojení přípravku a opakujte",
@@ -378,11 +348,13 @@ void MainWindow::calibrationFailure(){
     calibInProgress = false;
 }
 
+//_____Úspěšné dokončení kalibrace_____//
 void MainWindow::endCalibration(){
     QMessageBox::information(this, "Kalibrace", "Kalibrace proběhla úspěšně.", QMessageBox::Ok);
     calibInProgress = false;
 }
 
+//_____testNum paket_____//
 void MainWindow::testNumManage(char num)
 {
     commandNum = num;
@@ -400,11 +372,10 @@ void MainWindow::testNumManage(char num)
     lastNum++;
 }
 
+//_____testPhase paket_____//
 void MainWindow::testPhaseManage(char phase)
 {
     commandLetter = phase;
-    //ui->statusbar->showMessage(QString("Command %1 %2").arg(commandLetter).arg(commandNum + 48));
-    //statusBarTimer->start();
     
     switch (commandLetter)
     {
@@ -440,9 +411,10 @@ void MainWindow::testPhaseManage(char phase)
     }
 }
 
+//_____Datový paket_____//
 void MainWindow::dataManage(char* data, char dataLength)
 {
-    if(dataLength == 2*MEAS_TYPES_COUNT)
+    if(dataLength == 2*MEAS_TYPES_COUNT)    // Ošetření délky dat
     {
         unsigned int values[MEAS_TYPES_COUNT] = {0};
         for (int i = 0; i < MEAS_TYPES_COUNT; i++)
@@ -491,9 +463,10 @@ void MainWindow::dataManage(char* data, char dataLength)
     }
 }
 
+//_____Paket dat měření baterie_____//
 void MainWindow::dataBatManage(char* data, char dataLength)
 {
-    if(dataLength == 2)
+    if(dataLength == 2) // Ošetření délky dat
     {
         unsigned int values[MEAS_TYPES_COUNT] = {0};
         values[4] = (data[0] << 8) + data[1];
@@ -524,6 +497,7 @@ void MainWindow::dataBatManage(char* data, char dataLength)
     }
 }
 
+//_____Chyba spuštění testu_____//
 void MainWindow::startError(){
     if(QMessageBox::critical(this, "Spouštění testu",
     "Spuštění se nezdařilo.\nPřejete si opakovat spuštění?",

@@ -11,6 +11,7 @@
 #include <QQueue>
 #include <QTextStream>
 
+//_____Struktura paketu_____//
 typedef struct{
 	//char startSequence[9];
 	char type;
@@ -20,6 +21,7 @@ typedef struct{
 	//char endSequence[9];
 }Paket;
 
+//_____Typy vstupních dat_____//
 typedef enum{
 	DATA_PAKET = 1,
 	DATA_BAT_PAKET,
@@ -29,6 +31,7 @@ typedef enum{
 	REFRESH_PAKET
 }inPaketType;
 
+//_____Typy výstupních dat_____//
 typedef enum{
 	START_PAKET = 's',
 	CANCEL_PAKET = 'c',
@@ -38,14 +41,15 @@ typedef enum{
 	MANUAL_PAKET = 'm'	//není implementováno v MCU a nepoužívá se
 }outPaketType;
 
+//_____Třída pro práci se sériovým portem_____//
 class Serial : public QSerialPort
 {
     Q_OBJECT
 
     QQueue<char> buffer;
-    QList<QString> ports;
     bool commandChar = false;
 
+//___Veřejné funkce a proměnné___//
 public:
     Serial();
     ~Serial();
@@ -55,11 +59,10 @@ public:
     Paket* readData();
 	int writePaket(outPaketType, int);
 
+//___Veřejné sloty___//
 public slots:
     void next(){write(QByteArray(1, 'n'));};
     void back(){write(QByteArray(1, 'b'));};
-    
-signals:
 };
 
 #endif // SERIAL_H

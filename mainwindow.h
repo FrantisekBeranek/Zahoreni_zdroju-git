@@ -22,22 +22,26 @@ class MainWindow : public QMainWindow
     Serial* port;
     File* file;
 
+    //___Bool proměnné___//
     bool measureInProgress = false;
     bool manualMode = false;
     bool comError = false;
     bool calibInProgress = false;
 
+    //___Popis fáze testu___//
     unsigned char commandLetter;
     unsigned char commandNum;
+    
+    unsigned char lastNum = 0;
 
+    //___Počty chyb___//
     unsigned int errorCount = 0;
     unsigned int warningCount = 0;
 
+    //___Timery___//
     QTimer* timer;
     QTimer* endTimer;
     QTimer* startTimer;
-
-    unsigned char lastNum = 0;
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -58,7 +62,6 @@ private:
 
 
 public slots:
-    //void powerManage();
     void zahoreniManage(QAction*);
     void toolManage(QAction*);
     void getCOMs();
