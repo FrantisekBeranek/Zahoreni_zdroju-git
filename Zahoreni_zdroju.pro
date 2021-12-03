@@ -22,5 +22,6 @@ FORMS += mainwindow.ui \
     limits.ui
 SOURCES += File.cpp main.cpp mainwindow.cpp serial.cpp
 TRANSLATIONS += Zahoreni_zdroju_cs_CZ.ts
+RC_ICONS = .\src\tse.ico
 
 DISTFILES +=
