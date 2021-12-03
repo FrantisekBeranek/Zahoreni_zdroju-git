@@ -152,6 +152,7 @@ void MainWindow::zahoreniManage(QAction* action){
                                 port->writePaket(START_PAKET, 0);
                                 startTimer = new QTimer;
                                 startTimer->setSingleShot(true);
+                                startTimer->setInterval(1000);
                                 connect(startTimer, SIGNAL(timeout()), this, SLOT(startError()));
                                 startTimer->start();
                             }
