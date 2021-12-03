@@ -121,11 +121,11 @@ Paket* Serial::readData()
                     inPaket->CA_value = buffer.at(y-1);
                     inPaket->dataLength = y-i-4;    
                     char* data = (char*)malloc((inPaket->dataLength)*sizeof(char));
-                    /*for (int x = 0; x < inPaket->dataLength; x++)
+                    for (int x = 0; x < inPaket->dataLength; x++)
                     {
                         data[x] = buffer.at(x+i+3);
-                    }*/
-                    memcpy(data, &buffer.at(i+3), inPaket->dataLength);
+                    }
+                    //memcpy(data, &buffer.at(i+3), inPaket->dataLength);
                     inPaket->data = data;
 
                     QTextStream out(stdout);

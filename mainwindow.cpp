@@ -151,7 +151,6 @@ void MainWindow::zahoreniManage(QAction* action){
                             {
                                 port->writePaket(START_PAKET, 0);
                                 startTimer = new QTimer;
-                                startTimer->setInterval(2000);
                                 startTimer->setSingleShot(true);
                                 connect(startTimer, SIGNAL(timeout()), this, SLOT(startError()));
                                 startTimer->start();
@@ -250,12 +249,12 @@ void MainWindow::toolManage(QAction* action){
             if(QMessageBox::information(nullptr, "Kalibrace", "Připojte a zapněte zdroj", 
                     QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
             {
-                port->writePaket(CALIB_PAKET, 0);
                 calibInProgress = true;
                 timer->setInterval(5000);
                 timer->setSingleShot(true);
                 connect(timer, SIGNAL(timeout()), this, SLOT(calibrationFailure()));
                 timer->start();
+                port->writePaket(CALIB_PAKET, 0);
             }
         }
         //___Připojení portu___//
@@ -389,6 +388,7 @@ void MainWindow::testPhaseManage(char phase)
         if(startTimer != nullptr)
         {
             startTimer->stop();
+            disconnect(startTimer, SIGNAL(timeout()), this, SLOT(startError()));
             delete startTimer;
             startTimer = nullptr;
         }
@@ -422,6 +422,7 @@ void MainWindow::dataManage(char* data, char dataLength)
             values[i] |= ((data[2*i] << 8) & 0xFF00);
             values[i] |= (data[2*i + 1] & 0xFF);
         }
+
         if(calibInProgress)
         {
             timer->stop();
