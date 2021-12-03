@@ -242,11 +242,9 @@ void MainWindow::connectPort(QAction* action){
 //_____Obsloužení menu Nástrojů_____//
 void MainWindow::toolManage(QAction* action){
     if(action->text() != "Žádný dostupný port"){
-        if(measureInProgress && !comError){
-                QMessageBox::warning(this, "Zahoření zdrojů", "Akci nelze provádět v průběhu měření", QMessageBox::Ok);
-        }
         //___Požadavek na kalibraci___//
-        else if(action->text() == "Kalibrace"){
+        if(action->text() == "Kalibrace" && !measureInProgress)
+        {
             if(QMessageBox::information(nullptr, "Kalibrace", "Připojte a zapněte zdroj", 
                     QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
             {
@@ -259,8 +257,13 @@ void MainWindow::toolManage(QAction* action){
             }
         }
         //___Připojení portu___//
-        else{
+        else if(!measureInProgress || comError) //lze provést mimo měření nebo při chybě připojení
+        {
             connectPort(action);
+        }
+        else
+        {
+            QMessageBox::warning(this, "Zahoření zdrojů", "Akci nelze provádět v průběhu měření", QMessageBox::Ok);
         }
     }
 }
