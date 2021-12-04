@@ -109,7 +109,7 @@ void MainWindow::zahoreniManage(QAction* action){
         if(measureInProgress){
             QMessageBox::information(this, "Zahoření zdrojů", "Nejdříve ukončete probíhající test", QMessageBox::Ok);
         }
-        else if(port->serialConnected){
+        else if(port->serialConnected && !comError){
             
             serialTimer->stop();
             disconnect(serialTimer, SIGNAL(timeout()), this, SLOT(serialError()));
@@ -123,6 +123,8 @@ void MainWindow::zahoreniManage(QAction* action){
             
                 //---Zjistit požadovaný název a umístění---//
                 file->pathPDF = file->getPath();
+                if(file->pathPDF == nullptr)
+                    return;
                 QString path = file->pathPDF.section('.', 0, 0);
                 path = path.append(".txt");
 
@@ -131,7 +133,7 @@ void MainWindow::zahoreniManage(QAction* action){
                 serialTimer->start();
                 connect(serialTimer, SIGNAL(timeout()), this, SLOT(serialError()));
                 //---Vytvoř a otevři soubor (režim ReadWrite)---//
-                if(!path.isEmpty() && path != nullptr){
+                if(!path.isEmpty()){
                     if(file->createFile(path)){ 
                         measureInProgress = true;
                         file->testResult = true;
