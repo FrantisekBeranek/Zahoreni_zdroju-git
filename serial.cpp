@@ -80,7 +80,7 @@ bool Serial::connectPort(QString portName){
     return serialConnected;
 }
 
-//_____Získání dostupných vstupů___//
+//_____Získání dostupných portu___//
 QList<QString> Serial::getComs()
 {
     QList<QString> ports;
