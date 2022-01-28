@@ -73,7 +73,7 @@ bool Serial::connectPort(QString portName){
             errorMessage = "NoError";
             break;
         }
-        QMessageBox::warning(nullptr, tr("Simulace cidel"), tr("Nepodařilo se otevřít COM port\n %1").arg(errorMessage), QMessageBox::Cancel);
+        QMessageBox::warning(nullptr, tr("Zahoreni"), tr("Nepodařilo se otevřít COM port\n %1").arg(errorMessage), QMessageBox::Cancel);
         serialConnected = false;
     }
 

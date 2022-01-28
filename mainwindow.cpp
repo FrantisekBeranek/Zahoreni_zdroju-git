@@ -193,7 +193,7 @@ void MainWindow::getCOMs(){
     ui->menuCOM->clear();
     QList<QString> ports = port->getComs();
     if(ports.count()){
-        //___Výpis postupných portů do menuCom___//
+        //___Výpis dostupných portů do menuCom___//
         foreach(QString name, ports){
             ui->menuCOM->addAction(name);
         }
