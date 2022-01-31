@@ -20,6 +20,7 @@
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QWidget>
+#include "toolMenu.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -29,8 +30,6 @@ public:
     QAction *actionSpustit;
     QAction *actionZastavit;
     QAction *actionZm_nit_meze;
-    QAction *actionKalibrace;
-    QAction *actionX;
     QAction *actionOdpojit_port;
     QWidget *centralwidget;
     QTableWidget *resultTable;
@@ -40,8 +39,7 @@ public:
     QLabel *COMconnected;
     QStatusBar *statusbar;
     QMenuBar *menubar;
-    QMenu *menuN_stroje;
-    QMenu *menuCOM;
+    toolMenu *menuN_stroje;
     QMenu *menuZaho_en;
 
     void setupUi(QMainWindow *MainWindow)
@@ -64,10 +62,6 @@ public:
         actionZastavit->setObjectName(QString::fromUtf8("actionZastavit"));
         actionZm_nit_meze = new QAction(MainWindow);
         actionZm_nit_meze->setObjectName(QString::fromUtf8("actionZm_nit_meze"));
-        actionKalibrace = new QAction(MainWindow);
-        actionKalibrace->setObjectName(QString::fromUtf8("actionKalibrace"));
-        actionX = new QAction(MainWindow);
-        actionX->setObjectName(QString::fromUtf8("actionX"));
         actionOdpojit_port = new QAction(MainWindow);
         actionOdpojit_port->setObjectName(QString::fromUtf8("actionOdpojit_port"));
         centralwidget = new QWidget(MainWindow);
@@ -675,21 +669,14 @@ public:
         QFont font2;
         font2.setPointSize(10);
         menubar->setFont(font2);
-        menuN_stroje = new QMenu(menubar);
+        menuN_stroje = new toolMenu;
+        menubar->addMenu(menuN_stroje);
         menuN_stroje->setObjectName(QString::fromUtf8("menuN_stroje"));
-        menuCOM = new QMenu(menuN_stroje);
-        menuCOM->setObjectName(QString::fromUtf8("menuCOM"));
         menuZaho_en = new QMenu(menubar);
         menuZaho_en->setObjectName(QString::fromUtf8("menuZaho_en"));
         MainWindow->setMenuBar(menubar);
 
-        menubar->addAction(menuN_stroje->menuAction());
         menubar->addAction(menuZaho_en->menuAction());
-        menuN_stroje->addAction(menuCOM->menuAction());
-        menuN_stroje->addAction(actionKalibrace);
-        menuCOM->addAction(actionX);
-        menuCOM->addSeparator();
-        menuCOM->addAction(actionOdpojit_port);
         menuZaho_en->addAction(actionSpustit);
         menuZaho_en->addAction(actionZastavit);
         menuZaho_en->addSeparator();
@@ -706,8 +693,6 @@ public:
         actionSpustit->setText(QCoreApplication::translate("MainWindow", "Spustit", nullptr));
         actionZastavit->setText(QCoreApplication::translate("MainWindow", "Zastavit", nullptr));
         actionZm_nit_meze->setText(QCoreApplication::translate("MainWindow", "Zm\304\233nit meze", nullptr));
-        actionKalibrace->setText(QCoreApplication::translate("MainWindow", "Kalibrace", nullptr));
-        actionX->setText(QCoreApplication::translate("MainWindow", "x", nullptr));
         actionOdpojit_port->setText(QCoreApplication::translate("MainWindow", "Odpojit port", nullptr));
         QTableWidgetItem *___qtablewidgetitem = resultTable->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "5V kon", nullptr));
@@ -781,7 +766,6 @@ public:
         errorCount->setText(QCoreApplication::translate("MainWindow", "Po\304\215et z\303\241va\305\276n\303\275ch chyb: ", nullptr));
         COMconnected->setText(QCoreApplication::translate("MainWindow", "COM: ODPOJENO", nullptr));
         menuN_stroje->setTitle(QCoreApplication::translate("MainWindow", "N\303\241stroje", nullptr));
-        menuCOM->setTitle(QCoreApplication::translate("MainWindow", "COM", nullptr));
         menuZaho_en->setTitle(QCoreApplication::translate("MainWindow", "Zaho\305\231en\303\255", nullptr));
     } // retranslateUi
 

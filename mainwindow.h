@@ -9,6 +9,7 @@
 #include <QTableWidgetItem>
 #include "serial.h"
 #include "File.h"
+#include "toolMenu.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -64,8 +65,8 @@ private:
 public slots:
     void zahoreniManage(QAction*);
     void toolManage(QAction*);
-    void getCOMs();
     void connectPort(QAction*);
+    void disconnectPort();
     void read();
     void calibrationFailure();
     void endCalibration();

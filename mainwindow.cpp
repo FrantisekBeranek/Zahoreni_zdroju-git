@@ -27,7 +27,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(statusBarTimer, SIGNAL(timeout()), ui->statusbar, SLOT(clearMessage()));
 
     //___Propojení signálů a slotů___//
-    connect(ui->menuCOM, SIGNAL(aboutToShow()), this, SLOT(getCOMs()));
+    connect(ui->menuN_stroje->menuCOM, SIGNAL(connectRequest(QAction*)), this, SLOT(connectPort(QAction*)));
+    connect(ui->menuN_stroje->menuCOM, SIGNAL(disconnectRequest()), this, SLOT(disconnectPort()));
+
     connect(ui->menuN_stroje, SIGNAL(triggered(QAction*)), this, SLOT(toolManage(QAction*)));
     connect(ui->menuZaho_en, SIGNAL(triggered(QAction*)), this, SLOT(zahoreniManage(QAction*)));
     connect(port, SIGNAL(readyRead()), this, SLOT(read()));
@@ -188,84 +190,52 @@ void MainWindow::zahoreniManage(QAction* action){
     }
 }
 
-//_____Získání dostupných portů_____//
-void MainWindow::getCOMs(){
-    ui->menuCOM->clear();
-    QList<QString> ports = port->getComs();
-    if(ports.count()){
-        //___Výpis dostupných portů do menuCom___//
-        foreach(QString name, ports){
-            ui->menuCOM->addAction(name);
-        }
-        //___Přidání akce odpojení portu___//
-        ui->menuCOM->addSeparator();
-        ui->menuCOM->addAction(ui->actionOdpojit_port);
+//_____Připojení portu_____//
+void MainWindow::connectPort(QAction* action)
+{
+    if(port->connectPort(action->text()))
+    {
+        ui->statusbar->showMessage(action->text());
+        statusBarTimer->start();
+        serialTimer->start();
+        ui->COMconnected->setText("COM: PŘIPOJENO");
+        ui->COMconnected->setStyleSheet("QLabel { color: white; background: green; font-size: 16px;}");
     }
-    else{
-        ui->menuCOM->addAction("Žádný dostupný port");
+    else
+    {       
+        ui->COMconnected->setText("COM: ODPOJENO");
+        ui->COMconnected->setStyleSheet("QLabel { color: white; background: red; font-size: 16px;}");
     }
 }
 
-//_____Připojení portu_____//
-void MainWindow::connectPort(QAction* action){
-    //___Odpojení portu___//
-    if(action->text() == "Odpojit port")
+//_____Odpojení portu_____//
+void MainWindow::disconnectPort(){
+    if(port->serialConnected)
     {
-        if(port->serialConnected)
-        {
-            port->close();
-            port->serialConnected = false;
-            serialTimer->stop();
-            ui->statusbar->showMessage("Odpojeno");
-            statusBarTimer->start();
-            ui->COMconnected->setText("COM: ODPOJENO");
-            ui->COMconnected->setStyleSheet("QLabel { color: white; background: red; font-size: 16px;}");
-        }
-    }
-    //___Připojení___//
-    else
-    {
-        if(port->connectPort(action->text()))
-        {
-            ui->statusbar->showMessage(action->text());
-            statusBarTimer->start();
-            serialTimer->start();
-            ui->COMconnected->setText("COM: PŘIPOJENO");
-            ui->COMconnected->setStyleSheet("QLabel { color: white; background: green; font-size: 16px;}");
-        }
-        else
-        {       
-            ui->COMconnected->setText("COM: ODPOJENO");
-            ui->COMconnected->setStyleSheet("QLabel { color: white; background: red; font-size: 16px;}");
-        }
+        port->close();
+        port->serialConnected = false;
+        serialTimer->stop();
+        ui->statusbar->showMessage("Odpojeno");
+        statusBarTimer->start();
+        ui->COMconnected->setText("COM: ODPOJENO");
+        ui->COMconnected->setStyleSheet("QLabel { color: white; background: red; font-size: 16px;}");
     }
 }
 
 //_____Obsloužení menu Nástrojů_____//
 void MainWindow::toolManage(QAction* action){
-    if(action->text() != "Žádný dostupný port"){
-        //___Požadavek na kalibraci___//
-        if(action->text() == "Kalibrace" && !measureInProgress)
+    //___Požadavek na kalibraci___//
+    if(!measureInProgress && (action == ui->menuN_stroje->actionKalibrace))
+    {
+        if(QMessageBox::information(nullptr, "Kalibrace", "Připojte a zapněte zdroj", 
+                QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
         {
-            if(QMessageBox::information(nullptr, "Kalibrace", "Připojte a zapněte zdroj", 
-                    QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
-            {
-                calibInProgress = true;
-                timer->setInterval(5000);
-                timer->setSingleShot(true);
-                connect(timer, SIGNAL(timeout()), this, SLOT(calibrationFailure()));
-                timer->start();
-                port->writePaket(CALIB_PAKET, 0);
-            }
-        }
-        //___Připojení portu___//
-        else if(!measureInProgress || comError) //lze provést mimo měření nebo při chybě připojení
-        {
-            connectPort(action);
-        }
-        else
-        {
-            QMessageBox::warning(this, "Zahoření zdrojů", "Akci nelze provádět v průběhu měření", QMessageBox::Ok);
+            calibInProgress = true;
+            timer->setInterval(5000);
+            timer->setSingleShot(true);
+            connect(timer, SIGNAL(timeout()), this, SLOT(calibrationFailure()));
+            timer->start();
+            port->writePaket(CALIB_PAKET, 0);
         }
     }
 }
