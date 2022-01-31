@@ -23,7 +23,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
     QByteArrayData data[13];
-    char stringdata0[147];
+    char stringdata0[151];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -43,14 +43,14 @@ QT_MOC_LITERAL(7, 74, 4), // "read"
 QT_MOC_LITERAL(8, 79, 18), // "calibrationFailure"
 QT_MOC_LITERAL(9, 98, 14), // "endCalibration"
 QT_MOC_LITERAL(10, 113, 10), // "endMeasure"
-QT_MOC_LITERAL(11, 124, 11), // "serialError"
-QT_MOC_LITERAL(12, 136, 10) // "startError"
+QT_MOC_LITERAL(11, 124, 10), // "startError"
+QT_MOC_LITERAL(12, 135, 15) // "statusBarTiming"
 
     },
     "MainWindow\0zahoreniManage\0\0QAction*\0"
     "toolManage\0connectPort\0disconnectPort\0"
     "read\0calibrationFailure\0endCalibration\0"
-    "endMeasure\0serialError\0startError"
+    "endMeasure\0startError\0statusBarTiming"
 };
 #undef QT_MOC_LITERAL
 
@@ -108,8 +108,8 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 5: _t->calibrationFailure(); break;
         case 6: _t->endCalibration(); break;
         case 7: _t->endMeasure(); break;
-        case 8: _t->serialError(); break;
-        case 9: _t->startError(); break;
+        case 8: _t->startError(); break;
+        case 9: _t->statusBarTiming(); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {

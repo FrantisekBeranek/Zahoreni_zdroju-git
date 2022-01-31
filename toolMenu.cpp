@@ -9,11 +9,6 @@ COMmenu::COMmenu()
     //connect(this, SIGNAL(triggered(QAction*)), this, SLOT(handler(QAction*)));
 }
 
-COMmenu::COMmenu(QMenu* menu)
-{
-    COMmenu();
-    menu->addMenu(this);
-}
 
 COMmenu::~COMmenu()
 {

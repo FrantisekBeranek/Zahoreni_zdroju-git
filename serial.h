@@ -4,12 +4,15 @@
 #define MINIMUM_PAKET_SIZE 8
 
 #include "global_macros.h"
+#include <QWidget>
 #include <QSerialPortInfo>
 #include <QSerialPort>
 #include <QString>
 #include <QMessageBox>
 #include <QQueue>
 #include <QTextStream>
+#include <QTimer>
+#include <QLabel>
 
 //_____Struktura paketu_____//
 typedef struct{
@@ -41,6 +44,13 @@ typedef enum{
 	MANUAL_PAKET = 'm'	//není implementováno v MCU a nepoužívá se
 }outPaketType;
 
+//_____Stav portu_____//
+typedef enum{
+	PORT_OK = 0U,
+	PORT_DISCONNECTED,
+	PORT_UNACTIVE
+}portState;
+
 //_____Třída pro práci se sériovým portem_____//
 class Serial : public QSerialPort
 {
@@ -48,21 +58,41 @@ class Serial : public QSerialPort
 
     QQueue<char> buffer;
     bool commandChar = false;
+	portState status = PORT_DISCONNECTED;
+    QTimer* serialTimer;
 
-//___Veřejné funkce a proměnné___//
 public:
     Serial();
     ~Serial();
     bool serialConnected = false;
     QList<QString> getComs();
     bool connectPort(QString portName);
+	void closePort();
     Paket* readData();
 	int writePaket(outPaketType, int);
+	portState getStatus();
 
-//___Veřejné sloty___//
 public slots:
     void next(){write(QByteArray(1, 'n'));};
     void back(){write(QByteArray(1, 'b'));};
+	void serialError();
+
+signals:
+	void statusChanged(Serial*);
+	void connectionLost();
+
+};
+
+//_____Label pro zobrazení stavu portu_____//
+class portLabel : public QLabel
+{
+	Q_OBJECT
+
+public:
+	portLabel(QWidget *parent=nullptr) : QLabel(parent){};
+
+public slots:
+	void setState(Serial*);
 };
 
 #endif // SERIAL_H

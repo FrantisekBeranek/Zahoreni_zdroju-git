@@ -52,7 +52,6 @@ public:
 private:
     Ui::MainWindow *ui;
     QTimer* statusBarTimer;
-    QTimer* serialTimer;
 
     void managePaket(Paket* paket);
     void testNumManage(char num);
@@ -71,7 +70,7 @@ public slots:
     void calibrationFailure();
     void endCalibration();
     void endMeasure();
-    void serialError();
     void startError();
+    void statusBarTiming(){statusBarTimer->start();};
 };
 #endif // MAINWINDOW_H

@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     statusBarTimer->setSingleShot(true);
     statusBarTimer->setInterval(3000);
     connect(statusBarTimer, SIGNAL(timeout()), ui->statusbar, SLOT(clearMessage()));
+    connect(ui->statusbar, SIGNAL(messageChanged(QString)), this, SLOT(statusBarTiming()));
 
     //___Propojení signálů a slotů___//
     connect(ui->menuN_stroje->menuCOM, SIGNAL(connectRequest(QAction*)), this, SLOT(connectPort(QAction*)));
@@ -33,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->menuN_stroje, SIGNAL(triggered(QAction*)), this, SLOT(toolManage(QAction*)));
     connect(ui->menuZaho_en, SIGNAL(triggered(QAction*)), this, SLOT(zahoreniManage(QAction*)));
     connect(port, SIGNAL(readyRead()), this, SLOT(read()));
+    connect(port, SIGNAL(statusChanged(Serial*)), ui->COMconnected, SLOT(setState(Serial*)));
 
     timer = new QTimer;
     
@@ -42,19 +44,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     endTimer->setInterval(500);
     connect(endTimer, SIGNAL(timeout()), this, SLOT(endMeasure()));
 
-    //___Timer pro indikaci chyby připojení portu___//
-    serialTimer = new QTimer;
-    serialTimer->setSingleShot(true);
-    serialTimer->setInterval(3000);
-    connect(serialTimer, SIGNAL(timeout()), this, SLOT(serialError()));
-
     ui->COMconnected->setStyleSheet("QLabel { background: red; color: white; font-size: 16px;}");
 }
 
 //_____Destruktor____//
 MainWindow::~MainWindow()
 {
-    serialTimer->stop();
     if(measureInProgress)
     {
         file->makeProtocol();
@@ -69,7 +64,6 @@ MainWindow::~MainWindow()
 void MainWindow::endMeasure()
 {
     ui->statusbar->showMessage("Ukončení");
-    statusBarTimer->start();
 
     if(!file->makeProtocol()){
         //___Chyba zápisu do protokolu___//
@@ -107,14 +101,11 @@ void MainWindow::endMeasure()
 //_____Obsloužení menu Zahoření_____//
 void MainWindow::zahoreniManage(QAction* action){
     //___POžadavek na spuštění testu___//
-    if(action->text() == "Spustit"){
+    if(action == ui->actionSpustit){
         if(measureInProgress){
             QMessageBox::information(this, "Zahoření zdrojů", "Nejdříve ukončete probíhající test", QMessageBox::Ok);
         }
         else if(port->serialConnected && !comError){
-            
-            serialTimer->stop();
-            disconnect(serialTimer, SIGNAL(timeout()), this, SLOT(serialError()));
             //---Kontrola souboru meze---//
             if(!file->limitsCheck()){
                 //---Soubor "meze" je narušen nebo chybí---//
@@ -129,11 +120,6 @@ void MainWindow::zahoreniManage(QAction* action){
                     return;
                 QString path = file->pathPDF.section('.', 0, 0);
                 path = path.append(".txt");
-
-                //---Opětovné připojení serialTimeru---//
-                serialTimer->setInterval(1100);
-                serialTimer->start();
-                connect(serialTimer, SIGNAL(timeout()), this, SLOT(serialError()));
                 //---Vytvoř a otevři soubor (režim ReadWrite)---//
                 if(!path.isEmpty()){
                     if(file->createFile(path)){ 
@@ -172,7 +158,7 @@ void MainWindow::zahoreniManage(QAction* action){
         
     }
     //___Požadavek na zastavení testu___//
-    else if(action->text() == "Zastavit"){
+    else if(action == ui->actionZastavit){
         if(measureInProgress){
             int ret = QMessageBox::question(this, "Zahořování zdrojů",
                     "Opravdu si přejete ukončit test?", QMessageBox::Ok,
@@ -185,7 +171,7 @@ void MainWindow::zahoreniManage(QAction* action){
         }
     }
     //___Požadavek na nastavení mezí testu___//
-    else if(action->text() == "Změnit meze"){
+    else if(action == ui->actionZm_nit_meze){
         file->limitsSetup();
     }
 }
@@ -196,8 +182,6 @@ void MainWindow::connectPort(QAction* action)
     if(port->connectPort(action->text()))
     {
         ui->statusbar->showMessage(action->text());
-        statusBarTimer->start();
-        serialTimer->start();
         ui->COMconnected->setText("COM: PŘIPOJENO");
         ui->COMconnected->setStyleSheet("QLabel { color: white; background: green; font-size: 16px;}");
     }
@@ -212,13 +196,9 @@ void MainWindow::connectPort(QAction* action)
 void MainWindow::disconnectPort(){
     if(port->serialConnected)
     {
-        port->close();
+        port->closePort();
         port->serialConnected = false;
-        serialTimer->stop();
         ui->statusbar->showMessage("Odpojeno");
-        statusBarTimer->start();
-        ui->COMconnected->setText("COM: ODPOJENO");
-        ui->COMconnected->setStyleSheet("QLabel { color: white; background: red; font-size: 16px;}");
     }
 }
 
@@ -286,12 +266,6 @@ void MainWindow::read(){
         managePaket(data);
     }
 
-    //---Ošetření varování chyby spojení---//
-    serialTimer->stop();
-    serialTimer->setInterval(1100);
-    serialTimer->start();
-    ui->COMconnected->setText("COM: PŘIPOJENO");
-    ui->COMconnected->setStyleSheet("QLabel { color: white; background: green; font-size: 16px;}");
 
     if(comError){
         comError = false;
@@ -300,19 +274,6 @@ void MainWindow::read(){
             file->writeLog(COM_RECONNECTION);
     }
 
-}
-
-//_____Chyba připojení portu (přípravek se neozývá)_____//
-void MainWindow::serialError(){
-    if(measureInProgress)
-    {
-        warningCount++;
-        file->writeLog(COM_INTERRUPTION);
-    }
-    serialTimer->stop();
-    comError = true;
-    ui->COMconnected->setText("COM: NEAKTIVNÍ");
-    ui->COMconnected->setStyleSheet("QLabel { color: white; background: red; font-size: 16px;}");
 }
 
 //_____Chyba kalibrace (vypršel čas)_____//

@@ -21,6 +21,7 @@
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QWidget>
 #include "toolMenu.h"
+#include "serial.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -36,7 +37,7 @@ public:
     QLabel *testPhase;
     QLabel *actualResult;
     QLabel *errorCount;
-    QLabel *COMconnected;
+    portLabel *COMconnected;
     QStatusBar *statusbar;
     QMenuBar *menubar;
     toolMenu *menuN_stroje;
@@ -651,7 +652,7 @@ public:
         errorCount = new QLabel(centralwidget);
         errorCount->setObjectName(QString::fromUtf8("errorCount"));
         errorCount->setGeometry(QRect(270, 420, 261, 21));
-        COMconnected = new QLabel(centralwidget);
+        COMconnected = new portLabel(centralwidget);
         COMconnected->setObjectName(QString::fromUtf8("COMconnected"));
         COMconnected->setGeometry(QRect(540, 420, 131, 21));
         COMconnected->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);\n"

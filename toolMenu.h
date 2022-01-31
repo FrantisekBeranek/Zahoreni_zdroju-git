@@ -11,7 +11,7 @@ class COMmenu : public QMenu
 
 public:
     COMmenu();
-    COMmenu(QMenu*);
+    COMmenu(QMenu* parent);
     ~COMmenu();
 
 public slots:
@@ -28,7 +28,7 @@ class toolMenu : public QMenu
 
 public:
     toolMenu();
-    toolMenu(QMenuBar*);
+    toolMenu(QMenuBar*parent);
     ~toolMenu();
     
     COMmenu* menuCOM;
