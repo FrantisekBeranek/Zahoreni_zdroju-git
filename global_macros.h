@@ -1,6 +1,17 @@
 #ifndef GLOBAL_MACROS
 #define GLOBAL_MACROS
 
+typedef struct
+{
+    unsigned int measureInProgress  : 1;
+    unsigned int manualMode         : 1;
+    unsigned int calibInProgress    : 1;
+    unsigned int COMstate           : 2;
+        // 0 -> port OK
+        // 1 -> port Disconnected
+        // 2 -> port Unactive
+}appStatus;
+
 //#define QT_NO_DEBUG_OUTPUT
 
 //---Počet měřených veličin---//

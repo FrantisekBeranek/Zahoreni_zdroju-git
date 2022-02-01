@@ -20,6 +20,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     file = new File;
     connect(file, SIGNAL(calibrationOver()), this, SLOT(endCalibration()));
 
+    status.calibInProgress = 0;
+    status.COMstate = PORT_DISCONNECTED;
+    status.manualMode = false;
+    status.measureInProgress = false;
+
     //___Timer pro automatické mazání zpráv ze statusBar___//
     statusBarTimer = new QTimer;
     statusBarTimer->setSingleShot(true);
@@ -28,11 +33,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->statusbar, SIGNAL(messageChanged(QString)), this, SLOT(statusBarTiming()));
 
     //___Propojení signálů a slotů___//
-    connect(ui->menuN_stroje->menuCOM, SIGNAL(connectRequest(QAction*)), this, SLOT(connectPort(QAction*)));
-    connect(ui->menuN_stroje->menuCOM, SIGNAL(disconnectRequest()), this, SLOT(disconnectPort()));
+    connect(ui->menubar->tools->menuCOM, SIGNAL(connectRequest(QAction*)), this, SLOT(connectPort(QAction*)));
+    connect(ui->menubar->tools->menuCOM, SIGNAL(disconnectRequest()), this, SLOT(disconnectPort()));
 
-    connect(ui->menuN_stroje, SIGNAL(triggered(QAction*)), this, SLOT(toolManage(QAction*)));
-    connect(ui->menuZaho_en, SIGNAL(triggered(QAction*)), this, SLOT(zahoreniManage(QAction*)));
+    connect(ui->menubar->tools, SIGNAL(calibRequest()), this, SLOT(calibManage(/*QAction**/)));
+    //connect(ui->menubar->zahoreni, SIGNAL(triggered(QAction*)), this, SLOT(zahoreniManage(QAction*)));
+    connect(ui->menubar->zahoreni, SIGNAL(startRequest()), this, SLOT(startManage()));
+    connect(ui->menubar->zahoreni, SIGNAL(stopRequest()), this, SLOT(stopManage()));
+    connect(ui->menubar->zahoreni, SIGNAL(changeLimits()), this, SLOT(limitsManage()));
+    connect(this, SIGNAL(statusChanged(appStatus)), ui->menubar, SLOT(setState(appStatus)));
+    connect(port, SIGNAL(statusChanged(Serial*)), this, SLOT(portStatusChanged(Serial*)));
+    ui->menubar->zahoreni->actionZastavit->setEnabled(false);
+    ui->menubar->tools->menuCOM->disconnectAction->setEnabled(false);
+    ui->menubar->tools->actionKalibrace->setEnabled(false);
+    ui->menubar->zahoreni->actionSpustit->setEnabled(false);
+
     connect(port, SIGNAL(readyRead()), this, SLOT(read()));
     connect(port, SIGNAL(statusChanged(Serial*)), ui->COMconnected, SLOT(setState(Serial*)));
 
@@ -50,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 //_____Destruktor____//
 MainWindow::~MainWindow()
 {
-    if(measureInProgress)
+    if(status.measureInProgress)
     {
         file->makeProtocol();
         port->writePaket(CANCEL_PAKET, 0);
@@ -90,7 +105,8 @@ void MainWindow::endMeasure()
     }
 
     //___Výchozí nastavení proměnných___//
-    measureInProgress = false;
+    status.measureInProgress = false;
+    emit statusChanged(status);
     errorCount = 0;
     warningCount = 0;
 
@@ -98,119 +114,87 @@ void MainWindow::endMeasure()
     commandNum = 0;
 }
 
-//_____Obsloužení menu Zahoření_____//
-void MainWindow::zahoreniManage(QAction* action){
-    //___POžadavek na spuštění testu___//
-    if(action == ui->actionSpustit){
-        if(measureInProgress){
-            QMessageBox::information(this, "Zahoření zdrojů", "Nejdříve ukončete probíhající test", QMessageBox::Ok);
-        }
-        else if(port->serialConnected && !comError){
-            //---Kontrola souboru meze---//
-            if(!file->limitsCheck()){
-                //---Soubor "meze" je narušen nebo chybí---//
-                QMessageBox::warning (this, tr("Zahořování zdrojů"),
-                                    tr("Nejdříve nastavte krajní hodnoty pro test"));
-                return;
-            }
-            
-                //---Zjistit požadovaný název a umístění---//
-                file->pathPDF = file->getPath();
-                if(file->pathPDF == nullptr)
-                    return;
-                QString path = file->pathPDF.section('.', 0, 0);
-                path = path.append(".txt");
-                //---Vytvoř a otevři soubor (režim ReadWrite)---//
-                if(!path.isEmpty()){
-                    if(file->createFile(path)){ 
-                        measureInProgress = true;
-                        file->testResult = true;
-                        lastNum = 0;
-                        
-                        //---odešli příkaz k zahájení testu---//
-                        if(QMessageBox::information(this, "Zahoření zdrojů",
-                        "Připojte a spustě testovaný zdroj\nPoté stiskněte OK pro pokračování",
-                        QMessageBox::Ok) == QMessageBox::Ok){
-                            ui->testPhase->setText("Fáze testu: Test spuštěn");
-                            ui->actualResult->setText("Průběžný výsledek: Ano");
-                            ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": 0"));
-                            ui->resultTable->clearContents();
-                            if(manualMode)
-                                port->writePaket(MANUAL_PAKET, 0);
-                            else
-                            {
-                                port->writePaket(START_PAKET, 0);
-                                startTimer = new QTimer;
-                                startTimer->setSingleShot(true);
-                                startTimer->setInterval(1000);
-                                connect(startTimer, SIGNAL(timeout()), this, SLOT(startError()));
-                                startTimer->start();
-                            }
-
-                        }
-                    }
-                }
-        }
-        else
-        {
-            QMessageBox::warning(this, "Zahoření zdrojů", "Není připojeno zkušební zařízení pomocí COM portu", QMessageBox::Ok);
-        }
-        
-    }
-    //___Požadavek na zastavení testu___//
-    else if(action == ui->actionZastavit){
-        if(measureInProgress){
-            int ret = QMessageBox::question(this, "Zahořování zdrojů",
-                    "Opravdu si přejete ukončit test?", QMessageBox::Ok,
-                    QMessageBox::Cancel);
-            if(ret == QMessageBox::Ok){
-                ui->testPhase->setText("Fáze testu: Test přerušen");
-                port->writePaket(CANCEL_PAKET, 0);
-                endMeasure();
-            }
-        }
-    }
-    //___Požadavek na nastavení mezí testu___//
-    else if(action == ui->actionZm_nit_meze){
-        file->limitsSetup();
-    }
-}
-
-//_____Připojení portu_____//
-void MainWindow::connectPort(QAction* action)
+void MainWindow::startManage()
 {
-    if(port->connectPort(action->text()))
+    if(status.COMstate != PORT_OK)
     {
-        ui->statusbar->showMessage(action->text());
-        ui->COMconnected->setText("COM: PŘIPOJENO");
-        ui->COMconnected->setStyleSheet("QLabel { color: white; background: green; font-size: 16px;}");
+        QMessageBox::information (this, tr("Zahořování zdrojů"),
+                            tr("Není přípojen přípravek pomocí COM portu"));
+        return;
     }
-    else
-    {       
-        ui->COMconnected->setText("COM: ODPOJENO");
-        ui->COMconnected->setStyleSheet("QLabel { color: white; background: red; font-size: 16px;}");
+    //---Kontrola souboru meze---//
+    if(!file->limitsCheck()){
+        //---Soubor "meze" je narušen nebo chybí---//
+        QMessageBox::warning (this, tr("Zahořování zdrojů"),
+                            tr("Nejdříve nastavte krajní hodnoty pro test"));
+        return;
+    }
+
+    //---Zjistit požadovaný název a umístění---//
+    file->pathPDF = file->getPath();
+    if(file->pathPDF == nullptr)
+        return;
+    QString path = file->pathPDF.section('.', 0, 0);
+    path = path.append(".txt");
+    //---Vytvoř a otevři soubor (režim ReadWrite)---//
+    if(!path.isEmpty()){
+        if(file->createFile(path)){ 
+            status.measureInProgress = true;
+            emit statusChanged(status);
+            file->testResult = true;
+            lastNum = 0;
+            
+            //---odešli příkaz k zahájení testu---//
+            if(QMessageBox::information(this, "Zahoření zdrojů",
+            "Připojte a spustě testovaný zdroj\nPoté stiskněte OK pro pokračování",
+            QMessageBox::Ok) == QMessageBox::Ok){
+                ui->testPhase->setText("Fáze testu: Test spuštěn");
+                ui->actualResult->setText("Průběžný výsledek: Ano");
+                ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": 0"));
+                ui->resultTable->clearContents();
+                if(status.manualMode)
+                    port->writePaket(MANUAL_PAKET, 0);
+                else
+                {
+                    port->writePaket(START_PAKET, 0);
+                    startTimer = new QTimer;
+                    startTimer->setSingleShot(true);
+                    startTimer->setInterval(5000);
+                    connect(startTimer, SIGNAL(timeout()), this, SLOT(startError()));
+                    startTimer->start();
+                }
+
+            }
+        }
     }
 }
 
-//_____Odpojení portu_____//
-void MainWindow::disconnectPort(){
-    if(port->serialConnected)
-    {
-        port->closePort();
-        port->serialConnected = false;
-        ui->statusbar->showMessage("Odpojeno");
+void MainWindow::stopManage()
+{
+    int ret = QMessageBox::question(this, "Zahořování zdrojů",
+            "Opravdu si přejete ukončit test?", QMessageBox::Ok,
+            QMessageBox::Cancel);
+    if(ret == QMessageBox::Ok){
+        ui->testPhase->setText("Fáze testu: Test přerušen");
+        port->writePaket(CANCEL_PAKET, 0);
+        endMeasure();
     }
 }
 
-//_____Obsloužení menu Nástrojů_____//
-void MainWindow::toolManage(QAction* action){
-    //___Požadavek na kalibraci___//
-    if(!measureInProgress && (action == ui->menuN_stroje->actionKalibrace))
+void MainWindow::limitsManage()
+{
+    file->limitsSetup();
+}
+
+//___Požadavek na kalibraci___//
+void MainWindow::calibManage(){   
+    if(!status.measureInProgress)
     {
         if(QMessageBox::information(nullptr, "Kalibrace", "Připojte a zapněte zdroj", 
                 QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
         {
-            calibInProgress = true;
+            status.calibInProgress = true;
+            emit statusChanged(status);
             timer->setInterval(5000);
             timer->setSingleShot(true);
             connect(timer, SIGNAL(timeout()), this, SLOT(calibrationFailure()));
@@ -266,11 +250,10 @@ void MainWindow::read(){
         managePaket(data);
     }
 
-
-    if(comError){
-        comError = false;
-        //QMessageBox::information(this, tr("Komunikace"), tr("Spojení s přípravkem obnoveno"), QMessageBox::Ok);
-        if(measureInProgress)
+    if(status.COMstate == PORT_UNACTIVE){
+        status.COMstate = PORT_OK;
+        emit statusChanged(status);
+        if(status.measureInProgress)
             file->writeLog(COM_RECONNECTION);
     }
 
@@ -281,13 +264,15 @@ void MainWindow::calibrationFailure(){
     timer->stop();
     QMessageBox::warning(this, "Kalibrace", "Zkontrolujte připojení přípravku a opakujte",
         QMessageBox::Ok);
-    calibInProgress = false;
+    status.calibInProgress = false;
+    emit statusChanged(status);
 }
 
 //_____Úspěšné dokončení kalibrace_____//
 void MainWindow::endCalibration(){
     QMessageBox::information(this, "Kalibrace", "Kalibrace proběhla úspěšně.", QMessageBox::Ok);
-    calibInProgress = false;
+    status.calibInProgress = false;
+    emit statusChanged(status);
 }
 
 //_____testNum paket_____//
@@ -297,7 +282,7 @@ void MainWindow::testNumManage(char num)
         
     if(commandNum != lastNum)
     {
-        if(measureInProgress)
+        if(status.measureInProgress)
         {
             errorCount++;
             file->writeLog(DATA_LOSS, lastNum);
@@ -360,7 +345,7 @@ void MainWindow::dataManage(char* data, char dataLength)
             values[i] |= (data[2*i + 1] & 0xFF);
         }
 
-        if(calibInProgress)
+        if(status.calibInProgress)
         {
             timer->stop();
             disconnect(timer, SIGNAL(timeout()), this, SLOT(calibrationFailure()));
@@ -447,10 +432,17 @@ void MainWindow::startError(){
     }
     else
     {
-        measureInProgress = false;
+        status.measureInProgress = false;
+        emit statusChanged(status);
         startTimer->stop();
         delete startTimer;
         startTimer = nullptr;
         file->removeAll();
     }
+}
+
+void MainWindow::portStatusChanged(Serial* port)
+{
+    status.COMstate = port->getStatus();
+    emit statusChanged(status);
 }

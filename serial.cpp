@@ -87,6 +87,7 @@ bool Serial::connectPort(QString portName){
         }
         QMessageBox::warning(nullptr, tr("Zahoreni"), tr("Nepodařilo se otevřít COM port\n %1").arg(errorMessage), QMessageBox::Cancel);
         serialConnected = false;
+        status = PORT_DISCONNECTED;
     }
 
     emit statusChanged(this);
@@ -127,6 +128,12 @@ portState Serial::getStatus()
 //___Čtení příchozích dat___//
 Paket* Serial::readData()
 {
+    if(status == PORT_UNACTIVE)
+    {
+        status = PORT_OK;
+        emit statusChanged(this);
+    }
+
     serialTimer->start();
 
     char inChar;

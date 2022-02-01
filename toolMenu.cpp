@@ -2,21 +2,22 @@
 
 //_____COM MENU_____//
 
-COMmenu::COMmenu()
+COMmenu::COMmenu(QMenu* parent = nullptr) : QMenu(parent)
 {
     this->setTitle("COM");
-    //connect(this, SIGNAL(aboutToShow()), this, SLOT(getCOMs()));
-    //connect(this, SIGNAL(triggered(QAction*)), this, SLOT(handler(QAction*)));
-}
+    connect(this, SIGNAL(aboutToShow()), this, SLOT(getCOMs()));
+    connect(this, SIGNAL(triggered(QAction*)), this, SLOT(handler(QAction*)));
 
+    this->addAction("dumb");
+    disconnectAction = new QAction;
 
-COMmenu::~COMmenu()
-{
-
+    parent->addMenu(this);
 }
 
 void COMmenu::getCOMs()
 {
+    bool connectEnabled = this->actions().at(0)->isEnabled();
+    bool disconnectEnabled = disconnectAction->isEnabled();
     this->clear();  //Mazání dříve nalezených portů
     QList<QSerialPortInfo>unconnectedPorts = QSerialPortInfo::availablePorts();
     
@@ -24,24 +25,25 @@ void COMmenu::getCOMs()
     {
         //___Vytvoření seznamu jmen portů___//
         foreach(QSerialPortInfo portInfo, unconnectedPorts){
-            QAction* port = new QAction(portInfo.portName());
-            this->addAction(port);
+            QAction* port = this->addAction(portInfo.portName());
+            port->setEnabled(connectEnabled);
+            
         }
     }
     else
     {
-        QAction* noPort = new QAction("Žádný dostupný port");
-        noPort->setEnabled(false);
-        this->addAction(noPort);
+        QAction* noPort = this->addAction("Žádný dostupný port");
+        //noPort->setEnabled(false);
     }
 
     this->addSeparator();
-    this->addAction("Odpojit");
+    disconnectAction = this->addAction("Odpojit");
+    disconnectAction->setEnabled(disconnectEnabled);
 }
 
 void COMmenu::handler(QAction* action)
 {
-    if(action->text() == "Odpojit")
+    if(action == disconnectAction)
         emit disconnectRequest();
     else
         emit connectRequest(action);
@@ -49,27 +51,18 @@ void COMmenu::handler(QAction* action)
 
 //_____TOOL MENU_____//
 
-toolMenu::toolMenu()
+toolMenu::toolMenu(QMenuBar* parent = nullptr) : QMenu(parent)
 {
     //___COM menu___//
-    this->menuCOM = new COMmenu();
-    this->addAction(menuCOM->menuAction());
-    
-    connect(menuCOM, SIGNAL(aboutToShow()), menuCOM, SLOT(getCOMs()));
-    connect(menuCOM, SIGNAL(triggered(QAction*)), menuCOM, SLOT(handler(QAction*)));
+    this->menuCOM = new COMmenu(this);
+    this->addMenu(menuCOM);
 
     //___Kalibrace___//
     this->actionKalibrace = new QAction("Kalibrace");
     this->addAction(actionKalibrace);
-}
+    connect(actionKalibrace, SIGNAL(triggered()), this, SLOT(calibration()));
 
-toolMenu::toolMenu(QMenuBar* menuBar)
-{
-    toolMenu();
-    menuBar->addAction(this->menuAction());
-}
+    this->setTitle("N\303\241stroje");
 
-toolMenu::~toolMenu()
-{
-
+    parent->addMenu(this);
 }

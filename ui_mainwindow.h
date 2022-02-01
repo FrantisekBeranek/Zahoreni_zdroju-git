@@ -22,15 +22,13 @@
 #include <QtWidgets/QWidget>
 #include "toolMenu.h"
 #include "serial.h"
+#include "menuBar.h"
 
 QT_BEGIN_NAMESPACE
 
 class Ui_MainWindow
 {
 public:
-    QAction *actionSpustit;
-    QAction *actionZastavit;
-    QAction *actionZm_nit_meze;
     QAction *actionOdpojit_port;
     QWidget *centralwidget;
     QTableWidget *resultTable;
@@ -39,9 +37,7 @@ public:
     QLabel *errorCount;
     portLabel *COMconnected;
     QStatusBar *statusbar;
-    QMenuBar *menubar;
-    toolMenu *menuN_stroje;
-    QMenu *menuZaho_en;
+    menuBar *menubar;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -57,12 +53,6 @@ public:
         font.setPointSize(12);
         MainWindow->setFont(font);
         MainWindow->setAnimated(true);
-        actionSpustit = new QAction(MainWindow);
-        actionSpustit->setObjectName(QString::fromUtf8("actionSpustit"));
-        actionZastavit = new QAction(MainWindow);
-        actionZastavit->setObjectName(QString::fromUtf8("actionZastavit"));
-        actionZm_nit_meze = new QAction(MainWindow);
-        actionZm_nit_meze->setObjectName(QString::fromUtf8("actionZm_nit_meze"));
         actionOdpojit_port = new QAction(MainWindow);
         actionOdpojit_port->setObjectName(QString::fromUtf8("actionOdpojit_port"));
         centralwidget = new QWidget(MainWindow);
@@ -664,24 +654,13 @@ public:
         font1.setPointSize(8);
         statusbar->setFont(font1);
         MainWindow->setStatusBar(statusbar);
-        menubar = new QMenuBar(MainWindow);
+        menubar = new menuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
         menubar->setGeometry(QRect(0, 0, 1024, 22));
         QFont font2;
         font2.setPointSize(10);
         menubar->setFont(font2);
-        menuN_stroje = new toolMenu;
-        menubar->addMenu(menuN_stroje);
-        menuN_stroje->setObjectName(QString::fromUtf8("menuN_stroje"));
-        menuZaho_en = new QMenu(menubar);
-        menuZaho_en->setObjectName(QString::fromUtf8("menuZaho_en"));
         MainWindow->setMenuBar(menubar);
-
-        menubar->addAction(menuZaho_en->menuAction());
-        menuZaho_en->addAction(actionSpustit);
-        menuZaho_en->addAction(actionZastavit);
-        menuZaho_en->addSeparator();
-        menuZaho_en->addAction(actionZm_nit_meze);
 
         retranslateUi(MainWindow);
 
@@ -691,9 +670,9 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-        actionSpustit->setText(QCoreApplication::translate("MainWindow", "Spustit", nullptr));
-        actionZastavit->setText(QCoreApplication::translate("MainWindow", "Zastavit", nullptr));
-        actionZm_nit_meze->setText(QCoreApplication::translate("MainWindow", "Zm\304\233nit meze", nullptr));
+        menubar->zahoreni->actionSpustit->setText(QCoreApplication::translate("MainWindow", "Spustit", nullptr));
+        menubar->zahoreni->actionZastavit->setText(QCoreApplication::translate("MainWindow", "Zastavit", nullptr));
+        menubar->zahoreni->actionZm_nit_meze->setText(QCoreApplication::translate("MainWindow", "Zm\304\233nit meze", nullptr));
         actionOdpojit_port->setText(QCoreApplication::translate("MainWindow", "Odpojit port", nullptr));
         QTableWidgetItem *___qtablewidgetitem = resultTable->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "5V kon", nullptr));
@@ -766,8 +745,6 @@ public:
         actualResult->setText(QCoreApplication::translate("MainWindow", "Pr\305\257b\304\233\305\276n\303\275 v\303\275sledek:", nullptr));
         errorCount->setText(QCoreApplication::translate("MainWindow", "Po\304\215et z\303\241va\305\276n\303\275ch chyb: ", nullptr));
         COMconnected->setText(QCoreApplication::translate("MainWindow", "COM: ODPOJENO", nullptr));
-        menuN_stroje->setTitle(QCoreApplication::translate("MainWindow", "N\303\241stroje", nullptr));
-        menuZaho_en->setTitle(QCoreApplication::translate("MainWindow", "Zaho\305\231en\303\255", nullptr));
     } // retranslateUi
 
 };

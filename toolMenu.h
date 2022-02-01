@@ -10,9 +10,9 @@ class COMmenu : public QMenu
     Q_OBJECT
 
 public:
-    COMmenu();
     COMmenu(QMenu* parent);
-    ~COMmenu();
+
+    QAction* disconnectAction;
 
 public slots:
     void getCOMs();
@@ -27,9 +27,7 @@ class toolMenu : public QMenu
     Q_OBJECT
 
 public:
-    toolMenu();
     toolMenu(QMenuBar*parent);
-    ~toolMenu();
     
     COMmenu* menuCOM;
     QAction* actionKalibrace;
