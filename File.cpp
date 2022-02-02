@@ -16,8 +16,7 @@ File::File()
         {
             QMessageBox::critical(nullptr, "Chyba souborového systému!",
                 "Důležité soubory neexistují, nebo byly přesunuty", QMessageBox::Ok);
-        }
-        
+        }  
     }
     limitsPath = limitsFile.fileName();
 
@@ -298,59 +297,59 @@ int File::makeProtocol()
 {
     QTextStream out(this);
 
-        QString divLine = "+---------+---------+\n";
-        this->setFileName(path);
-        if(limitsFile.isOpen())
-            limitsFile.close();
-        if(this->isOpen())
-            this->close();
+    QString divLine = "+---------+---------+\n";
+    this->setFileName(path);
+    if(limitsFile.isOpen())
+        limitsFile.close();
+    if(this->isOpen())
+        this->close();
 
-        if(this->open(QIODevice::WriteOnly | QIODevice::Append)){   
-            //___Zapiš výsledek testu___//
-            out << divLine  << "\n\n" << "Vysledek: ";
-            if(testResult)
-                out << "+";
-            else
-                out << "-";
-            
-            //___Zapiš pracovníka a datum___//
-            out << "\nProvedl: " << worker << "    dne: " << QDateTime::currentDateTime().toString("dd.MM.yyyy");
-
-            this->close();
-
-            this->open(QIODevice::ReadOnly);
-
-            //___Nastavení formátu pdf___//
-            QPrinter printer(QPrinter::PrinterResolution);
-            printer.setOutputFormat(QPrinter::PdfFormat);
-            printer.setPaperSize(QPrinter::A4);
-            printer.setOutputFileName(pathPDF);
-            printer.setOrientation(QPrinter::Landscape);
-
-            QTextDocument doc;
-
-            this->seek(0);  //Nastaví kurzor v txt na začátek
-
-            //___Nastavení fontu pdf___//
-            QFont font("Courier", 1);
-            font.setFixedPitch(true);
-            doc.setDefaultFont(font);
-
-            //___Přepsání do pdf___//
-            doc.setPlainText(QString::fromLatin1(this->readAll()));
-            doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
-            doc.print(&printer);
-
-            //___Zavření a odstranění pomocného txt souboru___//
-            this->close();
-            this->remove();
-
-            return 1;
-        }
+    if(this->open(QIODevice::WriteOnly | QIODevice::Append)){   
+        //___Zapiš výsledek testu___//
+        out << divLine  << "\n\n" << "Vysledek: ";
+        if(testResult)
+            out << "+";
         else
-        {
-            return 0;  
-        }
+            out << "-";
+        
+        //___Zapiš pracovníka a datum___//
+        out << "\nProvedl: " << worker << "    dne: " << QDateTime::currentDateTime().toString("dd.MM.yyyy");
+
+        this->close();
+
+        this->open(QIODevice::ReadOnly);
+
+        //___Nastavení formátu pdf___//
+        QPrinter printer(QPrinter::PrinterResolution);
+        printer.setOutputFormat(QPrinter::PdfFormat);
+        printer.setPaperSize(QPrinter::A4);
+        printer.setOutputFileName(pathPDF);
+        printer.setOrientation(QPrinter::Landscape);
+
+        QTextDocument doc;
+
+        this->seek(0);  //Nastaví kurzor v txt na začátek
+
+        //___Nastavení fontu pdf___//
+        QFont font("Courier", 1);
+        font.setFixedPitch(true);
+        doc.setDefaultFont(font);
+
+        //___Přepsání do pdf___//
+        doc.setPlainText(QString::fromLatin1(this->readAll()));
+        doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
+        doc.print(&printer);
+
+        //___Zavření a odstranění pomocného txt souboru___//
+        this->close();
+        this->remove();
+
+        return 1;
+    }
+    else
+    {
+        return 0;  
+    }
 }
 
 //====Práce s mezemi====//

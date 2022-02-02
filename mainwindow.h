@@ -9,11 +9,13 @@
 #include <QTableWidgetItem>
 #include "serial.h"
 #include "File.h"
+#include "toolMenu.h"
+#include "menuBar.h"
+#include "global_macros.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
 
 class MainWindow : public QMainWindow
 {
@@ -23,10 +25,7 @@ class MainWindow : public QMainWindow
     File* file;
 
     //___Bool proměnné___//
-    bool measureInProgress = false;
-    bool manualMode = false;
-    bool comError = false;
-    bool calibInProgress = false;
+    appStatus status;
 
     //___Popis fáze testu___//
     unsigned char commandLetter;
@@ -51,7 +50,6 @@ public:
 private:
     Ui::MainWindow *ui;
     QTimer* statusBarTimer;
-    QTimer* serialTimer;
 
     void managePaket(Paket* paket);
     void testNumManage(char num);
@@ -62,15 +60,31 @@ private:
 
 
 public slots:
-    void zahoreniManage(QAction*);
-    void toolManage(QAction*);
-    void getCOMs();
-    void connectPort(QAction*);
+    void startManage();
+    void stopManage();
+    void limitsManage();
+    void calibManage(/*QAction**/);
+    void connectPort(QAction* action)
+    {
+        port->connectPort(action->text());
+        /*if(port->connectPort(action->text()))
+            this->ui->statusbar->showMessage(action->text());*/
+    };
+    void disconnectPort()
+    {
+        port->closePort();
+        //this->ui->statusbar->showMessage("Odpojeno");
+    };
     void read();
     void calibrationFailure();
     void endCalibration();
     void endMeasure();
-    void serialError();
     void startError();
+    void statusBarTiming(){statusBarTimer->start();};
+    void portStatusChanged(Serial*);
+
+signals:
+    void statusChanged(appStatus);
+
 };
 #endif // MAINWINDOW_H

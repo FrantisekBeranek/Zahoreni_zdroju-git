@@ -1,0 +1,11 @@
+release/File.o
+release/main.o
+release/mainwindow.o
+release/serial.o
+release/toolMenu.o
+release/menuBar.o
+release/moc_File.o
+release/moc_mainwindow.o
+release/moc_serial.o
+release/moc_toolMenu.o
+release/moc_menuBar.o
