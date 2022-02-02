@@ -43,7 +43,8 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(1024, 499);
+        MainWindow->resize(1024, 500);
+        MainWindow->setMinimumSize(1024, 500);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -629,7 +630,7 @@ public:
         __qtablewidgetitem198->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
         resultTable->setItem(23, 6, __qtablewidgetitem198);
         resultTable->setObjectName(QString::fromUtf8("resultTable"));
-        resultTable->setGeometry(QRect(10, 40, 1011, 371));
+        resultTable->setGeometry(QRect(10, 40, 1010, 370));
         resultTable->viewport()->setProperty("cursor", QVariant(QCursor(Qt::ArrowCursor)));
         resultTable->setShowGrid(true);
         resultTable->setCornerButtonEnabled(true);
@@ -746,6 +747,24 @@ public:
         errorCount->setText(QCoreApplication::translate("MainWindow", "Po\304\215et z\303\241va\305\276n\303\275ch chyb: ", nullptr));
         COMconnected->setText(QCoreApplication::translate("MainWindow", "COM: ODPOJENO", nullptr));
     } // retranslateUi
+
+    void resizeEvent(QResizeEvent* event)
+    {
+        int windowWidth = event->size().width();
+        int diff = 24;
+        for (int i = 0; i < MEAS_TYPES_COUNT+1; i++)
+        {
+            resultTable->setColumnWidth(i, (windowWidth-diff)/(MEAS_TYPES_COUNT+1));
+        }
+        resultTable->setFixedWidth(windowWidth-diff);
+
+        diff = event->size().height() - 500;
+        resultTable->setFixedHeight(370 + diff);
+
+        errorCount->setGeometry(QRect(270, 420+diff, 261, 21));
+        COMconnected->setGeometry(QRect(540, 420+diff, 261, 21));
+        actualResult->setGeometry(QRect(10, 420+diff, 261, 21));
+    }
 
 };
 

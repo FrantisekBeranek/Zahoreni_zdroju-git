@@ -75,6 +75,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    QMainWindow::resizeEvent(event);
+    ui->resizeEvent(event);
+}
+
 //___Ukončení testu___//
 void MainWindow::endMeasure()
 {
