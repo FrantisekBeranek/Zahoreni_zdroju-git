@@ -24,6 +24,7 @@ File::File()
     defaultPath.prepend(homePath1);
     calibPath.prepend(homePath1);
     patternPath.prepend(homePath1);
+    workersPath.prepend(homePath1);
 
     logFile = new QFile;
 }
@@ -48,11 +49,41 @@ QString File::getPath()
     //___Nastavení názvu souboru___//
     QString fileName = serialNumber;
     fileName.append(dateStr);
+    
+    QFile* workerFile = new QFile;
+    workerFile->setFileName(workersPath);
+    workerFile->open(QIODevice::ReadOnly);
+    QStringList workers;
+    QString input;
+    
+    input = workerFile->readLine(50);
+    while (!input.isEmpty())
+    {
+        workers << input;
+        input = workerFile->readLine(50);
+    }
+    workers << "Jiný pracovník";
+    workerFile->close();
+   
+    QString worker = QInputDialog::getItem(nullptr, "Jméno pracovníka",
+            "Zadejte své jméno", workers, 
+            0, false, &Ok);   //Zadání jména pracovníka
+    if (!Ok)    return nullptr; //Při neúspěchu ukonči
 
-    worker = QInputDialog::getText(nullptr, "Jméno pracovníka",
+    if(worker == "Jiný pracovník")
+    {
+        workerFile->open(QIODevice::WriteOnly | QIODevice::Append);
+        QString newWorker = QInputDialog::getText(nullptr, "Jméno pracovníka",
             "Zadejte své jméno", QLineEdit::Normal, 
             "", &Ok);   //Zadání jména pracovníka
-    if (!Ok)    return nullptr; //Při neúspěchu ukonči
+        if (!Ok)    return nullptr; //Při neúspěchu ukonči
+        worker = newWorker;
+        newWorker.prepend("\n");
+        workerFile->write(newWorker.toUtf8());
+        workerFile->close();
+    }
+
+    delete workerFile;
 
     //___Získání absolutní adresy nového souboru___//
     QFile file;

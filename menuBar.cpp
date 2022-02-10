@@ -28,6 +28,7 @@ void menuBar :: setState(appStatus status)
             this->tools->actionKalibrace->setEnabled(false);
             this->zahoreni->actionSpustit->setEnabled(false);
             this->zahoreni->actionZm_nit_meze->setEnabled(false);
+            this->zahoreni->actionZastavit->setEnabled(true);
     }
     else
     {
