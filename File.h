@@ -53,6 +53,7 @@ class File : public QFile
     QString limitsPath = "meze.txt";
     QString defaultPath = "defaultPath.txt";
     QString calibPath = "kalibrace.txt";
+    QString workersPath = "workers.txt";
     QString path;
     QDir dir;
 
