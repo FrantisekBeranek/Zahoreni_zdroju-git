@@ -57,7 +57,7 @@ private:
     void dataManage(char* data, char dataLength);
     void dataBatManage(char* data, char dataLength);
 
-
+    void resizeEvent(QResizeEvent*);
 
 public slots:
     void startManage();

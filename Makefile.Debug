@@ -476,6 +476,9 @@ debug/moc_mainwindow.cpp: mainwindow.h \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/qactiongroup.h \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/QMenuBar \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/qmenubar.h \
+		menuBar.h \
+		D:/QT/5.14.2/mingw73_64/include/QtWidgets/QAction \
+		mainwindow.h \
 		debug/moc_predefs.h \
 		D:/QT/5.14.2/mingw73_64/bin/moc.exe
 	'D:\QT\5.14.2\mingw73_64\bin\moc.exe' $(DEFINES) --include D:/Users/FrantisekBeranek/Dokumenty/TSE/projekty/zahoreni/Aplikace/Zahoreni_zdroju-git/debug/moc_predefs.h -ID:/QT/5.14.2/mingw73_64/mkspecs/win32-g++ -ID:/Users/FrantisekBeranek/Dokumenty/TSE/projekty/zahoreni/Aplikace/Zahoreni_zdroju-git -ID:/Users/FrantisekBeranek/Dokumenty/TSE/projekty/zahoreni/Aplikace/Zahoreni_zdroju-git -ID:/QT/5.14.2/mingw73_64/include -ID:/QT/5.14.2/mingw73_64/include/QtPrintSupport -ID:/QT/5.14.2/mingw73_64/include/QtWidgets -ID:/QT/5.14.2/mingw73_64/include/QtGui -ID:/QT/5.14.2/mingw73_64/include/QtANGLE -ID:/QT/5.14.2/mingw73_64/include/QtSerialPort -ID:/QT/5.14.2/mingw73_64/include/QtCore -IC:/Qt5/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++ -IC:/Qt5/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/x86_64-w64-mingw32 -IC:/Qt5/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/backward -IC:/Qt5/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include -IC:/Qt5/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include-fixed -IC:/Qt5/Tools/mingw730_64/x86_64-w64-mingw32/include mainwindow.h -o debug/moc_mainwindow.cpp
@@ -916,6 +919,7 @@ debug/moc_menuBar.cpp: menuBar.h \
 		D:/QT/5.14.2/mingw73_64/include/QtGui/qrawfont.h \
 		D:/QT/5.14.2/mingw73_64/include/QtGui/qfontdatabase.h \
 		toolMenu.h \
+		menuBar.h \
 		debug/moc_predefs.h \
 		D:/QT/5.14.2/mingw73_64/bin/moc.exe
 	'D:\QT\5.14.2\mingw73_64\bin\moc.exe' $(DEFINES) --include D:/Users/FrantisekBeranek/Dokumenty/TSE/projekty/zahoreni/Aplikace/Zahoreni_zdroju-git/debug/moc_predefs.h -ID:/QT/5.14.2/mingw73_64/mkspecs/win32-g++ -ID:/Users/FrantisekBeranek/Dokumenty/TSE/projekty/zahoreni/Aplikace/Zahoreni_zdroju-git -ID:/Users/FrantisekBeranek/Dokumenty/TSE/projekty/zahoreni/Aplikace/Zahoreni_zdroju-git -ID:/QT/5.14.2/mingw73_64/include -ID:/QT/5.14.2/mingw73_64/include/QtPrintSupport -ID:/QT/5.14.2/mingw73_64/include/QtWidgets -ID:/QT/5.14.2/mingw73_64/include/QtGui -ID:/QT/5.14.2/mingw73_64/include/QtANGLE -ID:/QT/5.14.2/mingw73_64/include/QtSerialPort -ID:/QT/5.14.2/mingw73_64/include/QtCore -IC:/Qt5/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++ -IC:/Qt5/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/x86_64-w64-mingw32 -IC:/Qt5/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/backward -IC:/Qt5/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include -IC:/Qt5/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include-fixed -IC:/Qt5/Tools/mingw730_64/x86_64-w64-mingw32/include menuBar.h -o debug/moc_menuBar.cpp
@@ -1303,6 +1307,8 @@ debug/main.o: main.cpp mainwindow.h \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/qactiongroup.h \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/QMenuBar \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/qmenubar.h \
+		menuBar.h \
+		D:/QT/5.14.2/mingw73_64/include/QtWidgets/QAction \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/QApplication \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/qapplication.h \
 		D:/QT/5.14.2/mingw73_64/include/QtCore/qcoreapplication.h \
@@ -1500,9 +1506,10 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/qactiongroup.h \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/QMenuBar \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/qmenubar.h \
+		menuBar.h \
+		D:/QT/5.14.2/mingw73_64/include/QtWidgets/QAction \
 		ui_mainwindow.h \
 		D:/QT/5.14.2/mingw73_64/include/QtCore/QVariant \
-		D:/QT/5.14.2/mingw73_64/include/QtWidgets/QAction \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/QApplication \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/qapplication.h \
 		D:/QT/5.14.2/mingw73_64/include/QtCore/qcoreapplication.h \
@@ -1513,8 +1520,7 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/QHeaderView \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/qheaderview.h \
 		D:/QT/5.14.2/mingw73_64/include/QtWidgets/QStatusBar \
-		D:/QT/5.14.2/mingw73_64/include/QtWidgets/qstatusbar.h \
-		menuBar.h
+		D:/QT/5.14.2/mingw73_64/include/QtWidgets/qstatusbar.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/mainwindow.o mainwindow.cpp
 
 debug/serial.o: serial.cpp serial.h \
