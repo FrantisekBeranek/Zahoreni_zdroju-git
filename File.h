@@ -53,6 +53,7 @@ class File : public QFile
     QString limitsPath = "meze.txt";
     QString defaultPath = "defaultPath.txt";
     QString calibPath = "kalibrace.txt";
+    QString workersPath = "workers.txt";
     QString path;
     QDir dir;
 
@@ -80,7 +81,6 @@ public:
 
     bool testResult = true;
 
-    QString getPath();  //dialogovým oknem zjistí adresu a název nového souboru
     int createFile(QString);   //vytvoří nový soubor a překopíruje do něj šablonu
     std::vector<QString> makeArray(QString, int);
     bool makeValues(unsigned int*, float*);
@@ -93,6 +93,10 @@ public:
     void writeLog(errorLogs);
     void showLog();
     void removeAll();
+    QString getWorkersPath(){return workersPath;};
+    QString getDefaultPath(){return defaultPath;};
+    void setSerialNumber(QString serial){serialNumber = serial;};
+    void setWorker(QString newWorker){worker = newWorker;};
 
 public slots:
     void saveLimits();

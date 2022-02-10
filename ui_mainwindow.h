@@ -754,7 +754,7 @@ public:
         int diff = 24;
         for (int i = 0; i < MEAS_TYPES_COUNT+1; i++)
         {
-            resultTable->setColumnWidth(i, (windowWidth-diff)/(MEAS_TYPES_COUNT+1));
+            resultTable->setColumnWidth(i, (windowWidth-diff)/(MEAS_TYPES_COUNT+1) -1);
         }
         resultTable->setFixedWidth(windowWidth-diff);
 

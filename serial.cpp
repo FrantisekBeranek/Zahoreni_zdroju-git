@@ -36,6 +36,7 @@ bool Serial::connectPort(QString portName){
         serialTimer->start();
         serialConnected = true;
         status = PORT_OK;
+        writePaket(CON_PAKET, 0);
     }
     else{
         //___Výpis chybové zprávy___//
@@ -112,12 +113,6 @@ void Serial::serialError(){
     status = PORT_UNACTIVE;
     emit statusChanged(this);
     emit connectionLost();
-    /*if(measureInProgress)
-    {
-        warningCount++;
-        file->writeLog(COM_INTERRUPTION);
-    }
-    comError = true;*/
 }
 
 portState Serial::getStatus()
@@ -126,7 +121,7 @@ portState Serial::getStatus()
 }
 
 //___Čtení příchozích dat___//
-Paket* Serial::readData()
+void Serial::readData()
 {
     if(status == PORT_UNACTIVE)
     {
@@ -166,21 +161,19 @@ Paket* Serial::readData()
                     //memcpy(data, &buffer.at(i+3), inPaket->dataLength);
                     inPaket->data = data;
 
-                    QTextStream out(stdout);
+                    //QTextStream out(stdout);
                     //___Vymazání přijatého paketu z bufferu___//
                     for (int x = 0; x < y+2; x++)
                     {
                         char tmp = buffer.dequeue();
                     }
                     
-                    return inPaket;
+                    emit paketFound(inPaket);
                 }
             }
             
         }
     }
-
-    return nullptr;
 }
 
 //_____Poslání paketu___//

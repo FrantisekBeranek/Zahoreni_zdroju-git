@@ -16,7 +16,7 @@ typedef struct
 
 //---Počet měřených veličin---//
 #define MEAS_TYPES_COUNT 7
-//#define FINAL
+#define FINAL
 
 #ifdef FINAL
 //---Počty měření v jednotlivých fázích---//

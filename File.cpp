@@ -24,6 +24,7 @@ File::File()
     defaultPath.prepend(homePath1);
     calibPath.prepend(homePath1);
     patternPath.prepend(homePath1);
+    workersPath.prepend(homePath1);
 
     logFile = new QFile;
 }
@@ -33,44 +34,6 @@ File::~File()
 {
     if(this->isOpen())
         this->close();
-}
-
-//_____Dialog při založení nového testu_____//
-QString File::getPath()
-{
-    QString dateStr = QDateTime::currentDateTime().toString("_dd_MM_yy");   //Získání data v daném formátu
-    bool Ok;
-    serialNumber = QInputDialog::getText(nullptr, "Sériové číslo",
-            "Zadejte sériové číslo testovaného zdroje", QLineEdit::Normal, 
-            "Zde zapište sériové číslo", &Ok);  //Zadání sériového čísla zdroje
-    if (!Ok)    return nullptr; //Při neúspěchu ukonči
-
-    //___Nastavení názvu souboru___//
-    QString fileName = serialNumber;
-    fileName.append(dateStr);
-
-    worker = QInputDialog::getText(nullptr, "Jméno pracovníka",
-            "Zadejte své jméno", QLineEdit::Normal, 
-            "", &Ok);   //Zadání jména pracovníka
-    if (!Ok)    return nullptr; //Při neúspěchu ukonči
-
-    //___Získání absolutní adresy nového souboru___//
-    QFile file;
-    file.setFileName(defaultPath);
-    if(file.exists()){
-        file.open(QIODevice::ReadOnly);
-        QString filePath = file.readLine();
-        fileName = QFileDialog::getSaveFileName(nullptr,
-            tr("Vytvořit soubor"), filePath.append(fileName),
-            tr("PDF File (*.pdf);;All Files (*)"));
-    }
-    else{
-        fileName = QFileDialog::getSaveFileName(nullptr,
-            tr("Vytvořit soubor"), "",
-            tr("PDF File (*.pdf);;All Files (*)"));
-    }
-
-    return fileName;
 }
 
 //_____Vytvoření souboru_____//

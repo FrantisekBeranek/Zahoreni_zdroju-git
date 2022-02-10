@@ -68,7 +68,7 @@ public:
     QList<QString> getComs();
     bool connectPort(QString portName);
 	void closePort();
-    Paket* readData();
+    void readData();
 	int writePaket(outPaketType, int);
 	portState getStatus();
 
@@ -80,6 +80,7 @@ public slots:
 signals:
 	void statusChanged(Serial*);
 	void connectionLost();
+	void paketFound(Paket*);
 
 };
 

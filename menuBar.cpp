@@ -27,6 +27,7 @@ void menuBar :: setState(appStatus status)
             this->tools->menuCOM->disconnectAction->setEnabled(false);
             this->tools->actionKalibrace->setEnabled(false);
             this->zahoreni->actionSpustit->setEnabled(false);
+            this->zahoreni->actionZastavit->setEnabled(true);
             this->zahoreni->actionZm_nit_meze->setEnabled(false);
     }
     else
@@ -45,7 +46,7 @@ void menuBar :: setState(appStatus status)
             foreach(QAction* port, this->tools->menuCOM->actions()){
                 port->setEnabled(true);
             }
-            this->tools->menuCOM->disconnectAction->setEnabled(false);
+            this->tools->menuCOM->disconnectAction->setEnabled(true);
             this->tools->actionKalibrace->setEnabled(false);
             this->zahoreni->actionSpustit->setEnabled(false);
         }
