@@ -148,15 +148,13 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
             bat = false;
         }
 
-        else if(testNum < (START_MEAS_COUNT + MAIN_MEAS_COUNT + BAT_START_MEAS_COUNT))   //baterie start
+        else    //baterie
         {
-            out2 << divLine << '\n' << "Baterie\n";
-            testName = "baterie  ";
-            bat = true;
-        }
-        
-        else  //test baterie
-        {
+            if(testNum <= (START_MEAS_COUNT + MAIN_MEAS_COUNT + BAT_START_MEAS_COUNT))
+            {
+                out2 << divLine << '\n' << "Baterie\n";
+            }
+            
             testName = QString("Mereni %1").arg(testNum-(START_MEAS_COUNT + MAIN_MEAS_COUNT + BAT_START_MEAS_COUNT)+1).leftJustified(9, ' ');
             bat = true;
         }

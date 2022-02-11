@@ -1,8 +1,8 @@
 #include "testProperties.h"
 
-bool testProperties::init(int supplyCount, QString workersPath, QString defaultPath)
+bool testProperties::init(int supplyCount, QString workersPath, QString defaultPath, std::vector<int> allreadySet)
 {
-    if(getPointer(supplyCount) < 0)
+    if(getPointer(supplyCount, allreadySet) < 0)
     {
         return false;
     }
@@ -101,22 +101,39 @@ QString testProperties::getWorker(QString workersPath)
     return worker;
 }
 
-int testProperties::getPointer(int supplyCount)
+int testProperties::getPointer(int supplyCount, std::vector<int> allreadySet)
 {
     //___Výběr zdroje k testu___//
     if(supplyCount)
     {
         QStringList zdroje;
 
-        for (unsigned char i = 0; i < supplyCount; i++)
+        for (int i = 0; i < supplyCount; i++)
         {
-            zdroje << QString::number(i+1);
+            bool inQueue = false;
+            for (int x = 0; x < allreadySet.size(); x++)
+            {
+                if(allreadySet.at(x) == i)
+                {
+                    inQueue = true;
+                    break;
+                }
+            }
+            
+            if(!inQueue)
+                zdroje << QString::number(i+1);
         }
+
+        if(zdroje.isEmpty())
+            zdroje << "Dostupné zdroje byly nastaveny";
+
         bool Ok;
         QString supplyPointer = QInputDialog::getItem(nullptr, "Číslo zdroje",
             "Zadejte číslo zdroje k testu", zdroje, 
             0, false, &Ok);
         if(!Ok)
+            return -1;
+        if(supplyPointer == "Dostupné zdroje byly nastaveny")
             return -1;
         pointer = supplyPointer.toInt()-1;
         return pointer;

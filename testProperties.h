@@ -19,7 +19,7 @@ private:
     QString getSerialNumber();
     QString getPath(QString);
     QString getWorker(QString);
-    int getPointer(int);
+    int getPointer(int, std::vector<int> allreadySet);
 
 public:
     testProperties(){};
@@ -27,7 +27,7 @@ public:
         : serialNumber{inSerialNumber}, path{inPath}, worker{inWorker}, pointer{inPointer} {};
     //~testProperties();
 
-    bool init(int supplyCount, QString workersPath, QString defaultPath);
+    bool init(int supplyCount, QString workersPath, QString defaultPath, std::vector<int> allreadySet);
     QString retPath(){return path;};
     QString retSerialNumber(){return serialNumber;};
     QString retWorker(){return worker;};

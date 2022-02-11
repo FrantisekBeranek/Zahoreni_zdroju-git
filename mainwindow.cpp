@@ -175,8 +175,17 @@ void MainWindow::startManage()
         return;
     }
 
+    std::vector<int> suppliesToTest_pointers;
+    for (int i = 0; i < suppliesToTest.count(); i++)
+    {
+        suppliesToTest_pointers.push_back(suppliesToTest.at(i)->retPointer());
+    }
+    if(status.measureInProgress)
+        suppliesToTest_pointers.push_back(supplyInTesting);
+    
+
     testProperties* properties = new testProperties;
-    if(properties->init(supplyCount, file->getWorkersPath(), file->getDefaultPath()) == false)
+    if(properties->init(supplyCount, file->getWorkersPath(), file->getDefaultPath(), suppliesToTest_pointers) == false)
     {
         delete properties;
         return;

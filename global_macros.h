@@ -21,7 +21,7 @@ typedef struct
 #ifdef FINAL
 //---Počty měření v jednotlivých fázích---//
     #define START_MEAS_COUNT 1
-    #define MAIN_MEAS_COUNT 18
+    #define MAIN_MEAS_COUNT 15
     #define BAT_START_MEAS_COUNT 0
     #define BAT_MAIN_MEAS_COUNT 3
 #else
