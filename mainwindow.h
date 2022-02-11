@@ -28,7 +28,7 @@ class MainWindow : public QMainWindow
     //___Bool proměnné___//
     appStatus status;
     int supplyInTesting;
-    QQueue<testProperties> suppliesToTest;
+    QQueue<testProperties*> suppliesToTest;
 
     //___Popis fáze testu___//
     unsigned char commandLetter;
@@ -83,6 +83,7 @@ public slots:
     void read();
     void calibrationFailure();
     void endCalibration();
+    void endMeasure(bool);
     void endMeasure();
     void startError();
     void statusBarTiming(){statusBarTimer->start();};

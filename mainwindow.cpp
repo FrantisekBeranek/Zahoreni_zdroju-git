@@ -86,6 +86,12 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 //___Ukončení testu___//
 void MainWindow::endMeasure()
 {
+    endMeasure(true);
+}
+
+//___Ukončení testu___//
+void MainWindow::endMeasure(bool continueInMeasure)
+{
     ui->statusbar->showMessage("Ukončení");
 
     if(!file->makeProtocol()){
@@ -119,14 +125,36 @@ void MainWindow::endMeasure()
     lastNum = 0;
     commandNum = 0;
 
+    if(!continueInMeasure)
+        suppliesToTest.clear();
+
     if(suppliesToTest.isEmpty())
     {
         status.measureInProgress = false;
         emit statusChanged(status);
+        ui->testPhase->setText("Fáze testu: Test ukončen");
     }
     else
     {
+        testProperties* properties = suppliesToTest.dequeue();
+        supplyInTesting = properties->retPointer();
         
+        ui->testPhase->setText("Fáze testu: Test spuštěn");
+        ui->actualResult->setText("Průběžný výsledek: Ano");
+        ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": 0"));
+        ui->resultTable->clearContents();
+        
+        port->writePaket(START_PAKET, properties->retPointer());
+        status.measureInProgress = true;
+        emit statusChanged(status);
+        file->testResult = true;
+        lastNum = 0;
+
+        startTimer = new QTimer;
+        startTimer->setSingleShot(true);
+        startTimer->setInterval(5000);
+        connect(startTimer, SIGNAL(timeout()), this, SLOT(startError()));
+        startTimer->start();
     }
     
 }
@@ -147,18 +175,19 @@ void MainWindow::startManage()
         return;
     }
 
-    int num = testProperties::getPointer(supplyCount);
-    QString worker = testProperties::getWorker(file->getWorkersPath());
-    QString serialNumber = testProperties::getSerialNumber();
-    QString path = testProperties::getPath(file->getDefaultPath(), serialNumber);
-    file->pathPDF = path;
-    file->setSerialNumber(serialNumber);
-    file->setWorker(worker);
-
-    testProperties* properties = new testProperties(serialNumber, path, worker, num);
-
-    if(file->pathPDF == nullptr)
+    testProperties* properties = new testProperties;
+    if(properties->init(supplyCount, file->getWorkersPath(), file->getDefaultPath()) == false)
+    {
+        delete properties;
         return;
+    }
+    file->pathPDF = properties->retPath();
+    file->setSerialNumber(properties->retSerialNumber());
+    file->setWorker(properties->retWorker());
+    supplyInTesting = properties->retPointer();
+
+    ui->statusbar->showMessage(QString::number(supplyInTesting));
+
     QString path = file->pathPDF.section('.', 0, 0);
     path = path.append(".txt");
     //---Vytvoř a otevři soubor (režim ReadWrite)---//
@@ -174,32 +203,23 @@ void MainWindow::startManage()
                     ui->actualResult->setText("Průběžný výsledek: Ano");
                     ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": 0"));
                     ui->resultTable->clearContents();
+                    
+                    port->writePaket(START_PAKET, supplyInTesting);
+                    status.measureInProgress = true;
+                    emit statusChanged(status);
+                    file->testResult = true;
+                    lastNum = 0;
+
+                    startTimer = new QTimer;
+                    startTimer->setSingleShot(true);
+                    startTimer->setInterval(5000);
+                    connect(startTimer, SIGNAL(timeout()), this, SLOT(startError()));
+                    startTimer->start();
                 }
-                if(status.manualMode)
-                    port->writePaket(MANUAL_PAKET, num);
                 else
                 {
-                    if(status.measureInProgress)
-                    {
-                        suppliesToTest.push_back(*properties);
-                    }
-                    else
-                    {
-                        port->writePaket(START_PAKET, num);
-                        status.measureInProgress = true;
-                        emit statusChanged(status);
-                        file->testResult = true;
-                        lastNum = 0;
-
-                        startTimer = new QTimer;
-                        startTimer->setSingleShot(true);
-                        startTimer->setInterval(5000);
-                        connect(startTimer, SIGNAL(timeout()), this, SLOT(startError()));
-                        startTimer->start();
-                    }
-                    
+                    suppliesToTest.enqueue(properties);
                 }
-
             }
         }
     }
@@ -213,7 +233,7 @@ void MainWindow::stopManage()
     if(ret == QMessageBox::Ok){
         ui->testPhase->setText("Fáze testu: Test přerušen");
         port->writePaket(CANCEL_PAKET, 0);
-        endMeasure();
+        endMeasure(true);
     }
 }
 
@@ -267,6 +287,11 @@ void MainWindow::managePaket(Paket* paket)
 
     case REFRESH_PAKET:
         /* code */
+        break;
+
+    case CANCEL_FROM_USER_PAKET:
+        if(status.measureInProgress)
+            endMeasure(false);
         break;
     
     default:
@@ -464,7 +489,7 @@ void MainWindow::startError(){
     "Spuštění se nezdařilo.\nPřejete si opakovat spuštění?",
     QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
     {
-        port->writePaket(START_PAKET, 0);
+        port->writePaket(START_PAKET, supplyInTesting);
         startTimer->setInterval(1000);
         startTimer->start();
     }
@@ -475,7 +500,9 @@ void MainWindow::startError(){
         startTimer->stop();
         delete startTimer;
         startTimer = nullptr;
+        port->writePaket(CANCEL_PAKET, supplyInTesting);
         file->removeAll();
+        ui->testPhase->setText("Fáze testu: Přerušeno");
     }
 }
 

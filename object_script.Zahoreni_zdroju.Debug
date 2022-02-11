@@ -4,6 +4,7 @@ debug/mainwindow.o
 debug/serial.o
 debug/toolMenu.o
 debug/menuBar.o
+debug/testProperties.o
 debug/moc_File.o
 debug/moc_mainwindow.o
 debug/moc_serial.o

@@ -31,7 +31,8 @@ typedef enum{
 	TEST_NUM_PAKET,
 	TEST_PHASE_PAKET,
 	ACK_PAKET,
-	REFRESH_PAKET
+	REFRESH_PAKET,
+	CANCEL_FROM_USER_PAKET
 }inPaketType;
 
 //_____Typy výstupních dat_____//

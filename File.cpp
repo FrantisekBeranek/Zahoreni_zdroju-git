@@ -633,7 +633,7 @@ void File::showLog()
 void File::removeAll()
 {
     this->remove();
-    if(logFile != nullptr)
+    if(logFile->exists())
     {
         logFile->remove();
         delete logFile;

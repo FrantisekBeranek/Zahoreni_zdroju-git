@@ -15,17 +15,19 @@ private:
     QString serialNumber;
     QString worker;
     int pointer;
+    
+    QString getSerialNumber();
+    QString getPath(QString);
+    QString getWorker(QString);
+    int getPointer(int);
+
 public:
-    testProperties(/* args */);
+    testProperties(){};
     testProperties(QString inSerialNumber, QString inPath, QString inWorker, int inPointer)
         : serialNumber{inSerialNumber}, path{inPath}, worker{inWorker}, pointer{inPointer} {};
-    ~testProperties();
+    //~testProperties();
 
-    static QString getSerialNumber();
-    static QString getPath(QString, QString);
-    static QString getWorker(QString);
-    static int getPointer(int);
-
+    bool init(int supplyCount, QString workersPath, QString defaultPath);
     QString retPath(){return path;};
     QString retSerialNumber(){return serialNumber;};
     QString retWorker(){return worker;};
@@ -37,12 +39,8 @@ public:
     //void setPointer(int newPointer){pointer = newPointer;};
 };
 
-testProperties::testProperties(/* args */)
+/*testProperties::~testProperties()
 {
-}
-
-testProperties::~testProperties()
-{
-}
+}*/
 
 #endif

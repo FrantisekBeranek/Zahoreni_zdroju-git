@@ -1,10 +1,31 @@
 #include "testProperties.h"
 
+bool testProperties::init(int supplyCount, QString workersPath, QString defaultPath)
+{
+    if(getPointer(supplyCount) < 0)
+    {
+        return false;
+    }
+    if(getSerialNumber() == nullptr)
+    {
+        return false;
+    }
+    if(getWorker(workersPath) == nullptr)
+    {
+        return false;
+    }
+    if(getPath(defaultPath) == nullptr)
+    {
+        return false;
+    }
+    return true;
+}
+
 QString testProperties::getSerialNumber()
 {
     bool Ok;
 
-    QString serialNumber = QInputDialog::getText(nullptr, "Sériové číslo",
+    serialNumber = QInputDialog::getText(nullptr, "Sériové číslo",
             "Zadejte sériové číslo testovaného zdroje", QLineEdit::Normal, 
             "Zde zapište sériové číslo", &Ok);  //Zadání sériového čísla zdroje
     if (!Ok)    return nullptr; //Při neúspěchu ukonči
@@ -12,13 +33,12 @@ QString testProperties::getSerialNumber()
     return serialNumber;
 }
 
-QString testProperties::getPath(QString defaultPath, QString defaultName)
+QString testProperties::getPath(QString defaultPath)
 {
     QString dateStr = QDateTime::currentDateTime().toString("_dd_MM_yy");   //Získání data v daném formátu
 
     //___Nastavení názvu souboru___//
-    QString fileName;// = serialNumber;
-    fileName.append(dateStr);
+    QString defaultName = serialNumber + dateStr;
 
     //___Získání absolutní adresy nového souboru___//
     QFile file;
@@ -26,24 +46,25 @@ QString testProperties::getPath(QString defaultPath, QString defaultName)
     if(file.exists()){
         file.open(QIODevice::ReadOnly);
         QString filePath = file.readLine();
-        fileName = QFileDialog::getSaveFileName(nullptr,
+        path = QFileDialog::getSaveFileName(nullptr,
             "Vytvořit soubor", filePath.append(defaultName),
             "PDF File (*.pdf);;All Files (*)");
+        file.close();
     }
     else{
-        fileName = QFileDialog::getSaveFileName(nullptr,
+        path = QFileDialog::getSaveFileName(nullptr,
             "Vytvořit soubor", "",
             "PDF File (*.pdf);;All Files (*)");
     }
 
-    return fileName;
+    return path;
 }
 
 QString testProperties::getWorker(QString workersPath)
 {
     QFile* workerFile = new QFile;
     workerFile->setFileName(workersPath);
-    workerFile->open(QIODevice::ReadOnly);
+    if(workerFile->open(QIODevice::ReadOnly) != true) return nullptr;
     QStringList workers;
     QString input;
     
@@ -83,12 +104,11 @@ QString testProperties::getWorker(QString workersPath)
 int testProperties::getPointer(int supplyCount)
 {
     //___Výběr zdroje k testu___//
-    unsigned char num;
     if(supplyCount)
     {
         QStringList zdroje;
 
-        for (int i = 0; i < supplyCount; i++)
+        for (unsigned char i = 0; i < supplyCount; i++)
         {
             zdroje << QString::number(i+1);
         }
@@ -96,14 +116,15 @@ int testProperties::getPointer(int supplyCount)
         QString supplyPointer = QInputDialog::getItem(nullptr, "Číslo zdroje",
             "Zadejte číslo zdroje k testu", zdroje, 
             0, false, &Ok);
-        num = supplyPointer.toInt() - 1;
         if(!Ok)
-            return;
+            return -1;
+        pointer = supplyPointer.toInt()-1;
+        return pointer;
     }
     else
     {
         QMessageBox::warning (nullptr, "Zahořování zdrojů",
             "Není znám počet připojitelných zdrojů.");
-        return;
+        return -1;
     }
 }
