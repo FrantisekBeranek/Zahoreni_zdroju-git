@@ -31,7 +31,8 @@ typedef enum{
 	TEST_NUM_PAKET,
 	TEST_PHASE_PAKET,
 	ACK_PAKET,
-	REFRESH_PAKET
+	REFRESH_PAKET,
+	CANCEL_FROM_USER_PAKET
 }inPaketType;
 
 //_____Typy výstupních dat_____//
@@ -68,7 +69,7 @@ public:
     QList<QString> getComs();
     bool connectPort(QString portName);
 	void closePort();
-    Paket* readData();
+    void readData();
 	int writePaket(outPaketType, int);
 	portState getStatus();
 
@@ -80,6 +81,7 @@ public slots:
 signals:
 	void statusChanged(Serial*);
 	void connectionLost();
+	void paketFound(Paket*);
 
 };
 

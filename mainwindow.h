@@ -12,6 +12,7 @@
 #include "toolMenu.h"
 #include "menuBar.h"
 #include "global_macros.h"
+#include "testProperties.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,6 +27,8 @@ class MainWindow : public QMainWindow
 
     //___Bool proměnné___//
     appStatus status;
+    int supplyInTesting;
+    QQueue<testProperties*> suppliesToTest;
 
     //___Popis fáze testu___//
     unsigned char commandLetter;
@@ -42,6 +45,8 @@ class MainWindow : public QMainWindow
     QTimer* endTimer;
     QTimer* startTimer;
 
+    int supplyCount = 0;
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -51,7 +56,6 @@ private:
     Ui::MainWindow *ui;
     QTimer* statusBarTimer;
 
-    void managePaket(Paket* paket);
     void testNumManage(char num);
     void testPhaseManage(char phase);
     void dataManage(char* data, char dataLength);
@@ -60,6 +64,7 @@ private:
     void resizeEvent(QResizeEvent*);
 
 public slots:
+    void managePaket(Paket* paket);
     void startManage();
     void stopManage();
     void limitsManage();
@@ -78,6 +83,7 @@ public slots:
     void read();
     void calibrationFailure();
     void endCalibration();
+    void endMeasure(bool);
     void endMeasure();
     void startError();
     void statusBarTiming(){statusBarTimer->start();};

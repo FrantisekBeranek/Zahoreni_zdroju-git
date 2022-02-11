@@ -36,74 +36,6 @@ File::~File()
         this->close();
 }
 
-//_____Dialog při založení nového testu_____//
-QString File::getPath()
-{
-    QString dateStr = QDateTime::currentDateTime().toString("_dd_MM_yy");   //Získání data v daném formátu
-    bool Ok;
-    serialNumber = QInputDialog::getText(nullptr, "Sériové číslo",
-            "Zadejte sériové číslo testovaného zdroje", QLineEdit::Normal, 
-            "Zde zapište sériové číslo", &Ok);  //Zadání sériového čísla zdroje
-    if (!Ok)    return nullptr; //Při neúspěchu ukonči
-
-    //___Nastavení názvu souboru___//
-    QString fileName = serialNumber;
-    fileName.append(dateStr);
-    
-    QFile* workerFile = new QFile;
-    workerFile->setFileName(workersPath);
-    workerFile->open(QIODevice::ReadOnly);
-    QStringList workers;
-    QString input;
-    
-    input = workerFile->readLine(50);
-    while (!input.isEmpty())
-    {
-        workers << input;
-        input = workerFile->readLine(50);
-    }
-    workers << "Jiný pracovník";
-    workerFile->close();
-   
-    QString worker = QInputDialog::getItem(nullptr, "Jméno pracovníka",
-            "Zadejte své jméno", workers, 
-            0, false, &Ok);   //Zadání jména pracovníka
-    if (!Ok)    return nullptr; //Při neúspěchu ukonči
-
-    if(worker == "Jiný pracovník")
-    {
-        workerFile->open(QIODevice::WriteOnly | QIODevice::Append);
-        QString newWorker = QInputDialog::getText(nullptr, "Jméno pracovníka",
-            "Zadejte své jméno", QLineEdit::Normal, 
-            "", &Ok);   //Zadání jména pracovníka
-        if (!Ok)    return nullptr; //Při neúspěchu ukonči
-        worker = newWorker;
-        newWorker.prepend("\n");
-        workerFile->write(newWorker.toUtf8());
-        workerFile->close();
-    }
-
-    delete workerFile;
-
-    //___Získání absolutní adresy nového souboru___//
-    QFile file;
-    file.setFileName(defaultPath);
-    if(file.exists()){
-        file.open(QIODevice::ReadOnly);
-        QString filePath = file.readLine();
-        fileName = QFileDialog::getSaveFileName(nullptr,
-            tr("Vytvořit soubor"), filePath.append(fileName),
-            tr("PDF File (*.pdf);;All Files (*)"));
-    }
-    else{
-        fileName = QFileDialog::getSaveFileName(nullptr,
-            tr("Vytvořit soubor"), "",
-            tr("PDF File (*.pdf);;All Files (*)"));
-    }
-
-    return fileName;
-}
-
 //_____Vytvoření souboru_____//
 int File::createFile(QString path)
 {
@@ -701,7 +633,7 @@ void File::showLog()
 void File::removeAll()
 {
     this->remove();
-    if(logFile != nullptr)
+    if(logFile->exists())
     {
         logFile->remove();
         delete logFile;
