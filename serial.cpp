@@ -108,7 +108,8 @@ void Serial::closePort()
 }
 
 //_____Chyba připojení portu (přípravek se neozývá)_____//
-void Serial::serialError(){
+void Serial::serialError()
+{
     serialTimer->stop();
     status = PORT_UNACTIVE;
     emit statusChanged(this);
@@ -123,7 +124,7 @@ portState Serial::getStatus()
 //___Čtení příchozích dat___//
 void Serial::readData()
 {
-    if(status == PORT_UNACTIVE)
+    if(status != PORT_OK)
     {
         status = PORT_OK;
         emit statusChanged(this);

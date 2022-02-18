@@ -6,7 +6,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QDateTime>
-#include <QFileDialog>>
+#include <QFileDialog>
 
 class testProperties
 {

@@ -75,8 +75,8 @@ public:
         resultTable->setHorizontalHeaderItem(5, __qtablewidgetitem5);
         QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
         resultTable->setHorizontalHeaderItem(6, __qtablewidgetitem6);
-        if (resultTable->rowCount() < 19)
-            resultTable->setRowCount(19);
+        if (resultTable->rowCount() < 22)
+            resultTable->setRowCount(22);
         QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
         resultTable->setVerticalHeaderItem(0, __qtablewidgetitem7);
         QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
@@ -115,6 +115,12 @@ public:
         resultTable->setVerticalHeaderItem(17, __qtablewidgetitem24);
         QTableWidgetItem *__qtablewidgetitem25 = new QTableWidgetItem();
         resultTable->setVerticalHeaderItem(18, __qtablewidgetitem25);
+        QTableWidgetItem *__qtablewidgetitem250 = new QTableWidgetItem();
+        resultTable->setVerticalHeaderItem(19, __qtablewidgetitem250);
+        QTableWidgetItem *__qtablewidgetitem251 = new QTableWidgetItem();
+        resultTable->setVerticalHeaderItem(20, __qtablewidgetitem251);
+        QTableWidgetItem *__qtablewidgetitem252 = new QTableWidgetItem();
+        resultTable->setVerticalHeaderItem(21, __qtablewidgetitem252);
         QTableWidgetItem *__qtablewidgetitem26 = new QTableWidgetItem();
         __qtablewidgetitem26->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
         resultTable->setItem(0, 0, __qtablewidgetitem26);
@@ -513,7 +519,28 @@ public:
         resultTable->setItem(18, 5, __qtablewidgetitem157);
         QTableWidgetItem *__qtablewidgetitem158 = new QTableWidgetItem();
         __qtablewidgetitem158->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
-        resultTable->setItem(23, 6, __qtablewidgetitem158);
+        resultTable->setItem(18, 6, __qtablewidgetitem158);
+        QTableWidgetItem *__qtablewidgetitem159 = new QTableWidgetItem();
+        __qtablewidgetitem159->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+        resultTable->setItem(19, 0, __qtablewidgetitem159);
+        QTableWidgetItem *__qtablewidgetitem160 = new QTableWidgetItem();
+        __qtablewidgetitem160->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+        resultTable->setItem(19, 1, __qtablewidgetitem160);
+        QTableWidgetItem *__qtablewidgetitem161 = new QTableWidgetItem();
+        __qtablewidgetitem161->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+        resultTable->setItem(19, 2, __qtablewidgetitem161);
+        QTableWidgetItem *__qtablewidgetitem162 = new QTableWidgetItem();
+        __qtablewidgetitem162->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+        resultTable->setItem(19, 3, __qtablewidgetitem162);
+        QTableWidgetItem *__qtablewidgetitem163 = new QTableWidgetItem();
+        __qtablewidgetitem163->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+        resultTable->setItem(19, 4, __qtablewidgetitem163);
+        QTableWidgetItem *__qtablewidgetitem164 = new QTableWidgetItem();
+        __qtablewidgetitem164->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+        resultTable->setItem(19, 5, __qtablewidgetitem164);
+        QTableWidgetItem *__qtablewidgetitem165 = new QTableWidgetItem();
+        __qtablewidgetitem165->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+        resultTable->setItem(19, 6, __qtablewidgetitem165);
         resultTable->setObjectName(QString::fromUtf8("resultTable"));
         resultTable->setGeometry(QRect(10, 40, 1010, 370));
         resultTable->viewport()->setProperty("cursor", QVariant(QCursor(Qt::ArrowCursor)));
@@ -607,11 +634,17 @@ public:
         QTableWidgetItem *___qtablewidgetitem22 = resultTable->verticalHeaderItem(15);
         ___qtablewidgetitem22->setText(QCoreApplication::translate("MainWindow", "Hlavn\303\255 test 15", nullptr));
         QTableWidgetItem *___qtablewidgetitem23 = resultTable->verticalHeaderItem(16);
-        ___qtablewidgetitem23->setText(QCoreApplication::translate("MainWindow", "Test baterie 1", nullptr));
+        ___qtablewidgetitem23->setText(QCoreApplication::translate("MainWindow", "Hlavn\303\255 test 16", nullptr));
         QTableWidgetItem *___qtablewidgetitem24 = resultTable->verticalHeaderItem(17);
-        ___qtablewidgetitem24->setText(QCoreApplication::translate("MainWindow", "Test baterie 2", nullptr));
+        ___qtablewidgetitem24->setText(QCoreApplication::translate("MainWindow", "Hlavn\303\255 test 17", nullptr));
         QTableWidgetItem *___qtablewidgetitem25 = resultTable->verticalHeaderItem(18);
-        ___qtablewidgetitem25->setText(QCoreApplication::translate("MainWindow", "Test baterie 3", nullptr));
+        ___qtablewidgetitem25->setText(QCoreApplication::translate("MainWindow", "Hlavn\303\255 test 18", nullptr));
+        QTableWidgetItem *___qtablewidgetitem26 = resultTable->verticalHeaderItem(19);
+        ___qtablewidgetitem26->setText(QCoreApplication::translate("MainWindow", "Test baterie 1", nullptr));
+        QTableWidgetItem *___qtablewidgetitem27 = resultTable->verticalHeaderItem(20);
+        ___qtablewidgetitem27->setText(QCoreApplication::translate("MainWindow", "Test baterie 2", nullptr));
+        QTableWidgetItem *___qtablewidgetitem28 = resultTable->verticalHeaderItem(21);
+        ___qtablewidgetitem28->setText(QCoreApplication::translate("MainWindow", "Test baterie 3", nullptr));
 
         const bool __sortingEnabled = resultTable->isSortingEnabled();
         resultTable->setSortingEnabled(false);
