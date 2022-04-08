@@ -25,7 +25,18 @@ Database::~Database()
 
 static int callback(void *NotUsed, int argc, char **argv, char **azColName)
 {
-
+    int i;
+    for(i = 0; i<argc; i++) {
+        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+        QMessageBox::warning(
+            nullptr,    //parent
+            "Zahořování zdrojů",    //title
+            QString("%1 = %2\n").arg(azColName[i]).arg(argv[i] ? argv[i] : "NULL"), //text
+            QMessageBox::Ok //button
+            );
+    }
+    printf("\n");
+    return 0;
 }
 
 int Database::writeRow(float* values, unsigned char testType, unsigned char testNum)
@@ -40,27 +51,32 @@ int Database::writeRow(float* values, unsigned char testType, unsigned char test
 
     //Write into database
     char* zErrMsg = 0;
-    char values_str[40] = {0};
-    sprintf(values_str, "%d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f);",\
-        supplyID, values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7]);
+    char values_str[100] = {0};
+    sprintf(values_str, "%d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f);",
+        supplyID, values[0], values[1], values[2], values[3], values[4], values[5], values[6]);
 
-    char* sql = "INSERT INTO Hodnoty (" \
+    char sql[200] = {"INSERT INTO Hodnoty (" \
                 "ID_zdroje, " \
-                "5V_KON, " \
-                "5V, "
-                "12V, " \
-                "15V, " \
+                "'5Vkon', " \
+                "'5V', "
+                "'12V', " \
+                "'15V', " \
                 "U_bat, " \
-                "24V, " \
-                "24V_O2) " \
-                "VALUES (" \
-                ;
+                "'24V', " \
+                "'24V_O2') " \
+                "VALUES (" };
     strcat(sql, values_str);
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     sqlite3_close(db);
 
     if(rc != SQLITE_OK)
     {
+        QMessageBox::warning(
+            nullptr,    //parent
+            "Zahořování zdrojů",    //title
+            QString("Nepodařilo se zapsat do databáze (%1)").arg(zErrMsg), //text
+            QMessageBox::Ok //button
+            );
         return -1;
     }
 
@@ -87,20 +103,30 @@ int Database::writeNewSupply(QString serialNumber, QString worker, QString date)
     char sql[100] = {0};
     sprintf(sql, "INSERT INTO Zdroje (" \
                 "seriove_cislo, "\
-                "pracovnik", \
-                "datum) VALUES ("\
-                "%s, "\
-                "%s, "\
-                "%s);",
-                serialNumber, worker, date);
+                "pracovnik," \
+                "datum) VALUES ( "\
+                "'%s', "\
+                "'%s', "\
+                "'%s');",
+                serialNumber.toLocal8Bit().data(), worker.toLocal8Bit().data(), date.toLocal8Bit().data());
     
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
-    sqlite3_close(db);
 
     if(rc != SQLITE_OK)
     {
+        QMessageBox::warning(
+            nullptr,    //parent
+            "Zahořování zdrojů",    //title
+            QString("Nepodařilo se zapsat do databáze (%1)").arg(sql), //text
+            QMessageBox::Ok //button
+            );
+        sqlite3_free(zErrMsg);
+        sqlite3_close(db);
         return -1;
     }
+
+    supplyID = sqlite3_last_insert_rowid(db);
+    sqlite3_close(db);
 
     return 0;
 }
@@ -120,10 +146,8 @@ int Database::writeResult(bool result)
     //write to database
     char* zErrMsg = 0;
     char sql[100] = {0};
-    sprintf(sql, "INSERT INTO Zdroje (" \
-                "vysledek) VALUES ("\
-                "%i);",
-                result);
+    sprintf(sql, "UPDATE Zdroje SET vysledek = %i WHERE ID=%i;",
+                result, supplyID);
     
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     sqlite3_close(db);

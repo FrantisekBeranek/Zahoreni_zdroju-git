@@ -1,5 +1,6 @@
 #include <sqlite3.h>
 #include <string.h>
+#include <stdio.h>
 #include <QMessageBox>
 #include <QString>
 
