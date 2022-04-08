@@ -5,6 +5,8 @@ debug/serial.o
 debug/toolMenu.o
 debug/menuBar.o
 debug/testProperties.o
+debug/database.o
+debug/sqlite3.o
 debug/moc_File.o
 debug/moc_mainwindow.o
 debug/moc_serial.o

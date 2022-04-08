@@ -62,6 +62,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(endTimer, SIGNAL(timeout()), this, SLOT(endMeasure()));
 
     ui->COMconnected->setStyleSheet("QLabel { background: red; color: white; font-size: 16px;}");
+
+    //___Database___//
+    db = new Database;
 }
 
 //_____Destruktor____//
@@ -117,6 +120,7 @@ void MainWindow::endMeasure(bool continueInMeasure)
                 QMessageBox::Ok);
         }   
     }
+    db->writeResult(file->testResult);
 
     //___Výchozí nastavení proměnných___//
     errorCount = 0;
@@ -202,6 +206,7 @@ void MainWindow::startManage()
     //---Vytvoř a otevři soubor (režim ReadWrite)---//
     if(!path.isEmpty()){
         if(file->createFile(path)){ 
+            db->writeNewSupply(properties->retSerialNumber(), properties->retWorker(), (QDateTime::currentDateTime()).toString("dd.MM.yyyy"));
             //---odešli příkaz k zahájení testu---//
             if(QMessageBox::information(this, "Zahoření zdrojů",
             "Připojte a spustě testovaný zdroj\nPoté stiskněte OK pro pokračování",
@@ -421,6 +426,7 @@ void MainWindow::dataManage(char* data, char dataLength)
         {
             float result[MEAS_TYPES_COUNT];
             file->makeValues(values, result);
+            db->writeRow(result, commandLetter, commandNum);
             if(!(file->writeToFile(result, commandLetter, commandNum)))
             {
                 errorCount++;
