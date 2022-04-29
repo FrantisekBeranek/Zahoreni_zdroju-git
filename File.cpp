@@ -5,26 +5,20 @@
 File::File()
 {
     //---Nastavení cesty k souboru meze podle domovského adresáře---//
-    QString tmp = homePath1;
+    QString appDirPath = QCoreApplication::applicationDirPath().section('/', 0, -2).append("/src/");
+    QString tmp = appDirPath;
     limitsFile.setFileName(tmp.append(limitsPath));
-    if(!limitsFile.exists()){
-        tmp = homePath2;
-        limitsFile.setFileName(tmp.append(limitsPath));
-        if(limitsFile.exists())
-            homePath1 = homePath2;  //homePath1 je výsledná platná adresa
-        else
-        {
-            QMessageBox::critical(nullptr, "Chyba souborového systému!",
-                "Důležité soubory neexistují, nebo byly přesunuty", QMessageBox::Ok);
-        }  
-    }
-    limitsPath = limitsFile.fileName();
+    if(!limitsFile.exists())
+    {
+        QMessageBox::critical(nullptr, "Chyba souborového systému!",
+            "Důležité soubory neexistují, nebo byly přesunuty", QMessageBox::Ok);
+    }  
 
     //___Úprava zbylých cest___//
-    defaultPath.prepend(homePath1);
-    calibPath.prepend(homePath1);
-    patternPath.prepend(homePath1);
-    workersPath.prepend(homePath1);
+    defaultPath.prepend(appDirPath);
+    calibPath.prepend(appDirPath);
+    patternPath.prepend(appDirPath);
+    workersPath.prepend(appDirPath);
 
     logFile = new QFile;
 }

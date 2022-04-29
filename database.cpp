@@ -4,7 +4,11 @@ Database::Database()
 {
     //Create connection to database
     int rc;
-    rc = sqlite3_open("zahorovani.db", &db);
+    QString appDirPath = QCoreApplication::applicationDirPath().section('/', 0, -2).append("/src/zahorovani.db");
+    QByteArray dbPathArr = appDirPath.toLocal8Bit();
+    char dbPath[strlen(dbPathArr.data())+1] = {0};
+    strcpy(dbPath, dbPathArr.data());
+    rc = sqlite3_open(dbPath, &db);
     if(rc)
     {
         QMessageBox::warning(
@@ -27,16 +31,18 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName)
 {
     //Funkce je volána při použití příkazu SELECT
     int i;
+    QString retMsg;
     for(i = 0; i<argc; i++) {
-        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-        QMessageBox::warning(
-            nullptr,    //parent
-            "Zahořování zdrojů",    //title
-            QString("%1 = %2\n").arg(azColName[i]).arg(argv[i] ? argv[i] : "NULL"), //text
-            QMessageBox::Ok //button
-            );
+        //printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+        retMsg.append("%1 = %2\n").arg(azColName[i]).arg(argv[i] ? argv[i] : "NULL");
     }
-    printf("\n");
+    //printf("\n");
+    QMessageBox::warning(
+        nullptr,    //parent
+        "Zahořování zdrojů",    //title
+        retMsg, //text
+        QMessageBox::Ok //button
+    );
     return 0;
 }
 

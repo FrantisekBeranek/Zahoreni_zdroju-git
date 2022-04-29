@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <QMessageBox>
 #include <QString>
+#include <QCoreApplication>
 
 /*
 
