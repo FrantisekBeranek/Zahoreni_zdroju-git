@@ -16,6 +16,7 @@
 #include <QTextDocument>
 #include <QTextCursor>
 #include <QTextTable>
+#include <QMovie>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class limits; }

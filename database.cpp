@@ -4,7 +4,7 @@ Database::Database()
 {
     //Create connection to database
     int rc;
-    QString appDirPath = QCoreApplication::applicationDirPath().section('/', 0, -2).append("/src/zahorovani.db");
+    QString appDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/zahorovani.db");
     QByteArray dbPathArr = appDirPath.toLocal8Bit();
     char dbPath[strlen(dbPathArr.data())+1] = {0};
     strcpy(dbPath, dbPathArr.data());

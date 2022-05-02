@@ -5,20 +5,35 @@
 File::File()
 {
     //---Nastavení cesty k souboru meze podle domovského adresáře---//
-    QString appDirPath = QCoreApplication::applicationDirPath().section('/', 0, -2).append("/src/");
-    QString tmp = appDirPath;
+    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/");
+    QString tmp = srcDirPath;
     limitsFile.setFileName(tmp.append(limitsPath));
     if(!limitsFile.exists())
     {
         QMessageBox::critical(nullptr, "Chyba souborového systému!",
             "Důležité soubory neexistují, nebo byly přesunuty", QMessageBox::Ok);
-    }  
+            //Pokud se soubory nenajdou, zobrazit confused Travoltu
+        // Load animated GIF
+        QMovie* movie = new QMovie(QString("200.gif").prepend(srcDirPath));
 
-    //___Úprava zbylých cest___//
-    defaultPath.prepend(appDirPath);
-    calibPath.prepend(appDirPath);
-    patternPath.prepend(appDirPath);
-    workersPath.prepend(appDirPath);
+        // Make sure the GIF was loaded correctly
+        if (movie->isValid()) 
+        {
+            // Play GIF
+            QLabel* label = new QLabel(nullptr);
+            label->setMovie(movie);
+            movie->start();
+            label->show();
+        }
+    }  
+    else
+    {
+        //___Úprava zbylých cest___//
+        defaultPath.prepend(srcDirPath);
+        calibPath.prepend(srcDirPath);
+        patternPath.prepend(srcDirPath);
+        workersPath.prepend(srcDirPath);
+    }
 
     logFile = new QFile;
 }
