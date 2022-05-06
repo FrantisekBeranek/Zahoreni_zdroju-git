@@ -21,7 +21,7 @@
 
 class Database
 {
-
+    QByteArray dbPath;
     sqlite3* db;
     int supplyID = 0;
 

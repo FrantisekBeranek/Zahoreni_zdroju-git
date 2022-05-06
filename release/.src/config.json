@@ -1,0 +1,59 @@
+{
+    "defaultPath": "D:/Users/FrantisekBeranek/Dokumenty/TSE/projekty/zahoreni/Aplikace/složka/",
+    "limits": {
+        "12Volts": {
+            "max": 11.5,
+            "maxOpen": 11.5,
+            "min": 10.5,
+            "minOpen": 10.5
+        },
+        "15Volts": {
+            "max": 14.5,
+            "maxOpen": 14.5,
+            "min": 13.5,
+            "minOpen": 13.5
+        },
+        "24Volts": {
+            "max": 15,
+            "maxOpen": 15,
+            "min": 15,
+            "minOpen": 15
+        },
+        "24VoltsOxy": {
+            "max": 15,
+            "maxOpen": 15,
+            "min": 15,
+            "minOpen": 15
+        },
+        "5VoltKon": {
+            "max": 4.5,
+            "maxOpen": 4.5,
+            "min": 3.5,
+            "minOpen": 3.5
+        },
+        "5Volts": {
+            "max": 4.5,
+            "maxOpen": 4.5,
+            "min": 3.5,
+            "minOpen": 3.5
+        },
+        "battery": {
+            "max": 0,
+            "maxOpen": 0,
+            "min": 0,
+            "minOpen": 0
+        }
+    },
+    "workers": [
+        "Beranek"
+    ],
+    "calibration": [
+        0.00323834,
+        0.00329381,
+        0.00772201,
+        0.00963391,
+        0.00588235,
+        0.0166898,
+        0.0159574
+    ]
+}

@@ -50,17 +50,12 @@ class File : public QFile
     Q_OBJECT
 
     QString patternPath = "mustr.txt";
-    QString limitsPath = "meze.txt";
-    QString defaultPath = "defaultPath.txt";
-    QString calibPath = "kalibrace.txt";
-    QString workersPath = "workers.txt";
     QString path;
     QDir dir;
 
     QString serialNumber;
     QString worker;
 
-    QFile limitsFile;
     QFile* logFile;
     limits* Form;
 
@@ -68,8 +63,6 @@ class File : public QFile
     QTextCursor* cursor;
 
     double transfer[7];
-
-    bool getConstants();
 
 public:
     File();
@@ -91,8 +84,6 @@ public:
     void writeLog(errorLogs);
     void showLog();
     void removeAll();
-    QString getWorkersPath(){return workersPath;};
-    QString getDefaultPath(){return defaultPath;};
     void setSerialNumber(QString serial){serialNumber = serial;};
     void setWorker(QString newWorker){worker = newWorker;};
 
@@ -101,7 +92,37 @@ public slots:
 
 signals:
     void calibrationOver();
+    void calibrationCancelled();
 
+};
+
+
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonArray>
+
+
+class JSON_handler
+{
+
+    QString path;
+    QFile confFile;
+
+public:
+    JSON_handler();
+    bool fileCheck();
+    void setFileName(QString);
+    void getWorkers(QStringList*);
+    void addWorker(QString);
+    void saveLimits(limits*);
+    void setLimits(limits*);
+    bool getLimits(std::vector<double>*, std::vector<double>*);
+    QString getDefaultPath();
+    void setDefaultPath(QString);
+    bool getConstants(double*);
+    bool saveConstants(double*);
 };
 
 

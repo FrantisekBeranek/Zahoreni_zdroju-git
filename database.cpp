@@ -5,10 +5,8 @@ Database::Database()
     //Create connection to database
     int rc;
     QString appDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/zahorovani.db");
-    QByteArray dbPathArr = appDirPath.toLocal8Bit();
-    char dbPath[strlen(dbPathArr.data())+1] = {0};
-    strcpy(dbPath, dbPathArr.data());
-    rc = sqlite3_open(dbPath, &db);
+    dbPath = appDirPath.toLocal8Bit();
+    rc = sqlite3_open(dbPath.data(), &db);
     if(rc)
     {
         QMessageBox::warning(
@@ -50,7 +48,7 @@ int Database::writeRow(float* values, unsigned char testType, unsigned char test
 {
     //Create connection to database
     int rc;
-    rc = sqlite3_open("zahorovani.db", &db);
+    rc = sqlite3_open(dbPath.data(), &db);
     if(rc)
     {
         return -1;
@@ -95,7 +93,7 @@ int Database::writeNewSupply(QString serialNumber, QString worker, QString date)
 {
     //Create connection to database
     int rc;
-    rc = sqlite3_open("zahorovani.db", &db);
+    rc = sqlite3_open(dbPath.data(), &db);
     if(rc)
     {
         return -1;
@@ -124,7 +122,7 @@ int Database::writeNewSupply(QString serialNumber, QString worker, QString date)
         QMessageBox::warning(
             nullptr,    //parent
             "Zahořování zdrojů",    //title
-            QString("Nepodařilo se zapsat do databáze (%1)").arg(sql), //text
+            QString("Nepodařilo se zapsat do databáze (%1)").arg(zErrMsg), //text
             QMessageBox::Ok //button
             );
         sqlite3_free(zErrMsg);
@@ -142,7 +140,7 @@ int Database::writeResult(bool result)
 {
     //Create connection to database
     int rc;
-    rc = sqlite3_open("zahorovani.db", &db);
+    rc = sqlite3_open(dbPath.data(), &db);
     if(rc)
     {
         return -1;

@@ -1,6 +1,6 @@
 #include "testProperties.h"
 
-bool testProperties::init(int supplyCount, QString workersPath, QString defaultPath, std::vector<int> allreadySet)
+bool testProperties::init(int supplyCount, std::vector<int> allreadySet)
 {
     if(getPointer(supplyCount, allreadySet) < 0)
     {
@@ -10,11 +10,11 @@ bool testProperties::init(int supplyCount, QString workersPath, QString defaultP
     {
         return false;
     }
-    if(getWorker(workersPath) == nullptr)
+    if(getWorker() == nullptr)
     {
         return false;
     }
-    if(getPath(defaultPath) == nullptr)
+    if(getPath() == nullptr)
     {
         return false;
     }
@@ -33,70 +33,58 @@ QString testProperties::getSerialNumber()
     return serialNumber;
 }
 
-QString testProperties::getPath(QString defaultPath)
+QString testProperties::getPath()
 {
     QString dateStr = QDateTime::currentDateTime().toString("_dd_MM_yy");   //Získání data v daném formátu
 
     //___Nastavení názvu souboru___//
     QString defaultName = serialNumber + dateStr;
 
+    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/");
+    JSON_handler confFile;
+    confFile.setFileName(QString("config.json").prepend(srcDirPath));
+    QString defaultPath = confFile.getDefaultPath();
     //___Získání absolutní adresy nového souboru___//
-    QFile file;
-    file.setFileName(defaultPath);
-    if(file.exists()){
-        file.open(QIODevice::ReadOnly);
-        QString filePath = file.readLine();
+    if(defaultPath != nullptr){
         path = QFileDialog::getSaveFileName(nullptr,
-            "Vytvořit soubor", filePath.append(defaultName),
+            "Vytvořit soubor", defaultPath.append(defaultName),
             "PDF File (*.pdf);;All Files (*)");
-        file.close();
     }
     else{
         path = QFileDialog::getSaveFileName(nullptr,
-            "Vytvořit soubor", "",
+            "Vytvořit soubor", defaultName,
             "PDF File (*.pdf);;All Files (*)");
     }
+    confFile.setDefaultPath(path);
 
     return path;
 }
 
-QString testProperties::getWorker(QString workersPath)
+QString testProperties::getWorker()
 {
-    QFile* workerFile = new QFile;
-    workerFile->setFileName(workersPath);
-    if(workerFile->open(QIODevice::ReadOnly) != true) return nullptr;
-    QStringList workers;
-    QString input;
     
-    input = workerFile->readLine(20);
-    while (!input.isEmpty())
-    {
-        workers << input;
-        input = workerFile->readLine(20);
-    }
-    workers << "Jiný pracovník";
-    workerFile->close();
+    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/");
+    JSON_handler confFile;
+    confFile.setFileName(QString("config.json").prepend(srcDirPath));
+    QStringList workers;
+    confFile.getWorkers(&workers);
+    workers.push_back("Jiný pracovník");
    
     bool Ok;
-    QString worker = QInputDialog::getItem(nullptr, "Jméno pracovníka",
+    worker = QInputDialog::getItem(nullptr, "Jméno pracovníka",
             "Zadejte své jméno", workers, 
             0, false, &Ok);   //Zadání jména pracovníka
     if (!Ok)    return nullptr; //Při neúspěchu ukonči
 
     if(worker == "Jiný pracovník")
     {
-        workerFile->open(QIODevice::WriteOnly | QIODevice::Append);
         QString newWorker = QInputDialog::getText(nullptr, "Jméno pracovníka",
             "Zadejte své jméno", QLineEdit::Normal, 
             "", &Ok);   //Zadání jména pracovníka
         if (!Ok)    return nullptr; //Při neúspěchu ukonči
+        confFile.addWorker(newWorker);
         worker = newWorker;
-        newWorker.prepend("\n");
-        workerFile->write(newWorker.toUtf8());
-        workerFile->close();
     }
-
-    delete workerFile;
 
     return worker;
 }
@@ -104,6 +92,7 @@ QString testProperties::getWorker(QString workersPath)
 int testProperties::getPointer(int supplyCount, std::vector<int> allreadySet)
 {
     //___Výběr zdroje k testu___//
+    supplyCount = 1;
     if(supplyCount)
     {
         QStringList zdroje;

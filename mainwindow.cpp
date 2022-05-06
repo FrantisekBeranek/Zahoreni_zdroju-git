@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     file = new File;
     connect(file, SIGNAL(calibrationOver()), this, SLOT(endCalibration()));
+    connect(file, SIGNAL(calibrationCancelled()), this, SLOT(endCalibration()));
 
     status.calibInProgress = 0;
     status.COMstate = PORT_DISCONNECTED;
@@ -189,7 +190,7 @@ void MainWindow::startManage()
     
 
     testProperties* properties = new testProperties;
-    if(properties->init(supplyCount, file->getWorkersPath(), file->getDefaultPath(), suppliesToTest_pointers) == false)
+    if(properties->init(supplyCount, suppliesToTest_pointers) == false)
     {
         delete properties;
         return;
@@ -335,6 +336,12 @@ void MainWindow::calibrationFailure(){
     timer->stop();
     QMessageBox::warning(this, "Kalibrace", "Zkontrolujte připojení přípravku a opakujte",
         QMessageBox::Ok);
+    status.calibInProgress = false;
+    emit statusChanged(status);
+}
+
+//_____Ukončení kalibrace uživatelem_____//
+void MainWindow::cancelCalibration(){
     status.calibInProgress = false;
     emit statusChanged(status);
 }
