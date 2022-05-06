@@ -13,6 +13,7 @@
 #include "menuBar.h"
 #include "global_macros.h"
 #include "testProperties.h"
+#include "database.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,6 +25,7 @@ class MainWindow : public QMainWindow
 
     Serial* port;
     File* file;
+    Database* db;
 
     //___Bool proměnné___//
     appStatus status;

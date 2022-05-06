@@ -4,7 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "D:\\Qt\\5.14.2\\mingw73_64\\include\\**"
+                "D:\\Qt\\5.14.2\\mingw73_64\\include\\**",
+                "C:\\sqlite-amalgamation-3380200\\**"
             ],
             "defines": [
                 "_DEBUG",

@@ -5,6 +5,8 @@ release/serial.o
 release/toolMenu.o
 release/menuBar.o
 release/testProperties.o
+release/database.o
+release/sqlite3.o
 release/moc_File.o
 release/moc_mainwindow.o
 release/moc_serial.o

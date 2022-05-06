@@ -17,10 +17,10 @@ QT += printsupport
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 # Input
-HEADERS += File.h mainwindow.h serial.h ui_mainwindow.h toolMenu.h menuBar.h testProperties.h
+HEADERS += File.h mainwindow.h serial.h ui_mainwindow.h toolMenu.h menuBar.h testProperties.h database.h sqlite3.h
 FORMS += mainwindow.ui \
     limits.ui
-SOURCES += File.cpp main.cpp mainwindow.cpp serial.cpp toolMenu.cpp menuBar.cpp testProperties.cpp
+SOURCES += File.cpp main.cpp mainwindow.cpp serial.cpp toolMenu.cpp menuBar.cpp testProperties.cpp database.cpp sqlite3.c
 TRANSLATIONS += Zahoreni_zdroju_cs_CZ.ts
 RC_ICONS = .\src\tse.ico
 

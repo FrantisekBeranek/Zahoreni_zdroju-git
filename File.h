@@ -48,7 +48,6 @@ class File : public QFile
 {
     Q_OBJECT
 
-    QString homePath2 = ".\\src\\";
     QString patternPath = "mustr.txt";
     QString limitsPath = "meze.txt";
     QString defaultPath = "defaultPath.txt";
@@ -74,8 +73,6 @@ class File : public QFile
 public:
     File();
     ~File();
-    
-    QString homePath1 = "..\\src\\";
 
     QString pathPDF;
 
