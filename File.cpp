@@ -5,7 +5,7 @@
 File::File()
 {
     //---Nastavení cesty k souboru meze podle domovského adresáře---//
-    QString appDirPath = QCoreApplication::applicationDirPath().section('/', 0, -2).append("/src/");
+    QString appDirPath = QCoreApplication::applicationDirPath().section('/', 0, -1).append("/.src/");
     QString tmp = appDirPath;
     limitsFile.setFileName(tmp.append(limitsPath));
     if(!limitsFile.exists())
