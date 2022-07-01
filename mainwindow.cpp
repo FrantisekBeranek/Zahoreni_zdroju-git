@@ -207,7 +207,7 @@ void MainWindow::startManage()
     //---Vytvoř a otevři soubor (režim ReadWrite)---//
     if(!path.isEmpty()){
         if(file->createFile(path)){ 
-            db->writeNewSupply(properties->retSerialNumber(), properties->retWorker(), (QDateTime::currentDateTime()).toString("dd.MM.yyyy"));
+            db->writeNewSupply(properties->retSerialNumber(), properties->retWorker(), (QDateTime::currentDateTime()).toString("yyyy-mm-dd hh:mm:ss:sss"));
             //---odešli příkaz k zahájení testu---//
             if(QMessageBox::information(this, "Zahoření zdrojů",
             "Připojte a spustě testovaný zdroj\nPoté stiskněte OK pro pokračování",
@@ -399,7 +399,7 @@ void MainWindow::testPhaseManage(char phase)
         break;
 
     case 'b':   //Baterie start
-        ui->testPhase->setText("Fáze testu: Spouštění měření baterie");
+        ui->testPhase->setText("Fáze testu: Hlavní test baterie v průběhu");
         break;
 
     case 'M':   //Hlavní test baterie

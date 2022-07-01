@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[23];
-    char stringdata0[255];
+    QByteArrayData data[24];
+    char stringdata0[273];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -49,21 +49,23 @@ QT_MOC_LITERAL(13, 130, 6), // "action"
 QT_MOC_LITERAL(14, 137, 14), // "disconnectPort"
 QT_MOC_LITERAL(15, 152, 4), // "read"
 QT_MOC_LITERAL(16, 157, 18), // "calibrationFailure"
-QT_MOC_LITERAL(17, 176, 14), // "endCalibration"
-QT_MOC_LITERAL(18, 191, 10), // "endMeasure"
-QT_MOC_LITERAL(19, 202, 10), // "startError"
-QT_MOC_LITERAL(20, 213, 15), // "statusBarTiming"
-QT_MOC_LITERAL(21, 229, 17), // "portStatusChanged"
-QT_MOC_LITERAL(22, 247, 7) // "Serial*"
+QT_MOC_LITERAL(17, 176, 17), // "cancelCalibration"
+QT_MOC_LITERAL(18, 194, 14), // "endCalibration"
+QT_MOC_LITERAL(19, 209, 10), // "endMeasure"
+QT_MOC_LITERAL(20, 220, 10), // "startError"
+QT_MOC_LITERAL(21, 231, 15), // "statusBarTiming"
+QT_MOC_LITERAL(22, 247, 17), // "portStatusChanged"
+QT_MOC_LITERAL(23, 265, 7) // "Serial*"
 
     },
     "MainWindow\0statusChanged\0\0appStatus\0"
     "managePaket\0Paket*\0paket\0startManage\0"
     "stopManage\0limitsManage\0calibManage\0"
     "connectPort\0QAction*\0action\0disconnectPort\0"
-    "read\0calibrationFailure\0endCalibration\0"
-    "endMeasure\0startError\0statusBarTiming\0"
-    "portStatusChanged\0Serial*"
+    "read\0calibrationFailure\0cancelCalibration\0"
+    "endCalibration\0endMeasure\0startError\0"
+    "statusBarTiming\0portStatusChanged\0"
+    "Serial*"
 };
 #undef QT_MOC_LITERAL
 
@@ -73,7 +75,7 @@ static const uint qt_meta_data_MainWindow[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      16,   14, // methods
+      17,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -81,24 +83,25 @@ static const uint qt_meta_data_MainWindow[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   94,    2, 0x06 /* Public */,
+       1,    1,   99,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       4,    1,   97,    2, 0x0a /* Public */,
-       7,    0,  100,    2, 0x0a /* Public */,
-       8,    0,  101,    2, 0x0a /* Public */,
-       9,    0,  102,    2, 0x0a /* Public */,
-      10,    0,  103,    2, 0x0a /* Public */,
-      11,    1,  104,    2, 0x0a /* Public */,
-      14,    0,  107,    2, 0x0a /* Public */,
-      15,    0,  108,    2, 0x0a /* Public */,
-      16,    0,  109,    2, 0x0a /* Public */,
-      17,    0,  110,    2, 0x0a /* Public */,
-      18,    1,  111,    2, 0x0a /* Public */,
-      18,    0,  114,    2, 0x0a /* Public */,
-      19,    0,  115,    2, 0x0a /* Public */,
-      20,    0,  116,    2, 0x0a /* Public */,
-      21,    1,  117,    2, 0x0a /* Public */,
+       4,    1,  102,    2, 0x0a /* Public */,
+       7,    0,  105,    2, 0x0a /* Public */,
+       8,    0,  106,    2, 0x0a /* Public */,
+       9,    0,  107,    2, 0x0a /* Public */,
+      10,    0,  108,    2, 0x0a /* Public */,
+      11,    1,  109,    2, 0x0a /* Public */,
+      14,    0,  112,    2, 0x0a /* Public */,
+      15,    0,  113,    2, 0x0a /* Public */,
+      16,    0,  114,    2, 0x0a /* Public */,
+      17,    0,  115,    2, 0x0a /* Public */,
+      18,    0,  116,    2, 0x0a /* Public */,
+      19,    1,  117,    2, 0x0a /* Public */,
+      19,    0,  120,    2, 0x0a /* Public */,
+      20,    0,  121,    2, 0x0a /* Public */,
+      21,    0,  122,    2, 0x0a /* Public */,
+      22,    1,  123,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3,    2,
@@ -114,11 +117,12 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void, QMetaType::Bool,    2,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 22,    2,
+    QMetaType::Void, 0x80000000 | 23,    2,
 
        0        // eod
 };
@@ -139,12 +143,13 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 7: _t->disconnectPort(); break;
         case 8: _t->read(); break;
         case 9: _t->calibrationFailure(); break;
-        case 10: _t->endCalibration(); break;
-        case 11: _t->endMeasure((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 12: _t->endMeasure(); break;
-        case 13: _t->startError(); break;
-        case 14: _t->statusBarTiming(); break;
-        case 15: _t->portStatusChanged((*reinterpret_cast< Serial*(*)>(_a[1]))); break;
+        case 10: _t->cancelCalibration(); break;
+        case 11: _t->endCalibration(); break;
+        case 12: _t->endMeasure((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 13: _t->endMeasure(); break;
+        case 14: _t->startError(); break;
+        case 15: _t->statusBarTiming(); break;
+        case 16: _t->portStatusChanged((*reinterpret_cast< Serial*(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -157,7 +162,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
                 *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QAction* >(); break;
             }
             break;
-        case 15:
+        case 16:
             switch (*reinterpret_cast<int*>(_a[1])) {
             default: *reinterpret_cast<int*>(_a[0]) = -1; break;
             case 0:
@@ -206,13 +211,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 16)
+        if (_id < 17)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 16;
+        _id -= 17;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 16)
+        if (_id < 17)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 16;
+        _id -= 17;
     }
     return _id;
 }

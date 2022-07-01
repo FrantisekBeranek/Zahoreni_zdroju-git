@@ -513,7 +513,7 @@ JSON_handler::JSON_handler()
 {
     QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/config.json");
     path = srcDirPath;
-    confFile.setFileName(QString("config.json").prepend(srcDirPath));
+    confFile.setFileName(srcDirPath);
 }
 
 void JSON_handler::setFileName(QString fileName)
@@ -523,8 +523,7 @@ void JSON_handler::setFileName(QString fileName)
 
 bool JSON_handler::fileCheck()
 {
-    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/");
-    confFile.setFileName(QString("config.json").prepend(srcDirPath));
+    confFile.setFileName(path);
     return confFile.exists();
 }
 
@@ -535,7 +534,7 @@ void JSON_handler::getWorkers(QStringList* workers)
     {
         QString data = (QString)confFile.readAll();
         confFile.close();
-        QJsonDocument confDoc = QJsonDocument::fromJson(data.toLatin1());
+        QJsonDocument confDoc = QJsonDocument::fromJson(data.toUtf8());
         QJsonObject confObj = confDoc.object();
         QJsonArray workersArray = confObj.value("workers").toArray();
         for (int i = 0; i < workersArray.size(); i++)
@@ -639,7 +638,7 @@ void JSON_handler::setLimits(limits* Form)
     {
         QString data = (QString)confFile.readAll();
         confFile.close();
-        QJsonDocument confDoc = QJsonDocument::fromJson(data.toLocal8Bit());
+        QJsonDocument confDoc = QJsonDocument::fromJson(data.toUtf8());
         QJsonObject confObj = confDoc.object();
         QJsonObject limitsObj = confObj.value("limits").toObject();
 
@@ -695,7 +694,7 @@ bool JSON_handler::getLimits(std::vector<double>* limits_open, std::vector<doubl
     {
         QString data = (QString)confFile.readAll();
         confFile.close();
-        QJsonDocument confDoc = QJsonDocument::fromJson(data.toLatin1());
+        QJsonDocument confDoc = QJsonDocument::fromJson(data.toUtf8());
         QJsonObject confObj = confDoc.object();
         QJsonObject limitsObj = confObj.value("limits").toObject();
 
@@ -753,9 +752,10 @@ QString JSON_handler::getDefaultPath()
     {
         QString data = (QString)confFile.readAll();
         confFile.close();
-        QJsonDocument confDoc = QJsonDocument::fromJson(data.toLocal8Bit());
-        if(!confDoc.isObject())
+        QJsonDocument confDoc = QJsonDocument::fromJson(data.toUtf8());
+        if(!confDoc.isObject()){
             return nullptr;
+        }
         QJsonObject confObj = confDoc.object();
         return confObj.value("defaultPath").toString();
     }
@@ -769,9 +769,11 @@ void JSON_handler::setDefaultPath(QString fileName)
     if(confFile.open(QIODevice::ReadWrite))
     {
         QString data = (QString)confFile.readAll();
-        QJsonDocument confDoc = QJsonDocument::fromJson(data.toLocal8Bit());
-        if(!confDoc.isObject())
+        QJsonDocument confDoc = QJsonDocument::fromJson(data.toUtf8());
+        if(!confDoc.isObject()){
+            QMessageBox::information(nullptr, "defaultPath", "fuky fuk", QMessageBox::Ok);
             return;
+        }
         QJsonObject confObj = confDoc.object();
         confObj.insert("defaultPath", defaultDir);
         confDoc.setObject(confObj);
@@ -787,7 +789,7 @@ bool JSON_handler::getConstants(double* constantsValues)
     {
         QString data = (QString)confFile.readAll();
         confFile.close();
-        QJsonDocument confDoc = QJsonDocument::fromJson(data.toLatin1());
+        QJsonDocument confDoc = QJsonDocument::fromJson(data.toUtf8());
         if(!confDoc.isObject())
             return false;
         QJsonObject confObj = confDoc.object();
@@ -813,16 +815,19 @@ bool JSON_handler::saveConstants(double* constants)
         QJsonDocument confDoc = QJsonDocument::fromJson(data);
         QJsonObject confObj = confDoc.object();
         QJsonArray constantsArray = confObj.value("calibration").toArray();
-        if(MEAS_TYPES_COUNT != constantsArray.size())
-            return false;
+        /*if(MEAS_TYPES_COUNT != constantsArray.size())
+            return false;*/
         for (int i = 0; i < MEAS_TYPES_COUNT; i++)
         {
-            constantsArray.at(i).toDouble(constants[i]);
+            constantsArray.replace(i, QJsonValue(constants[i]));
+            //constantsArray.at(i).toDouble(constants[i]);
         }
         confObj.insert("calibration", constantsArray);
         confDoc.setObject(confObj);
         confFile.resize(0);
         confFile.write(confDoc.toJson());
         confFile.close();
+        return true;
     }
+    return false;
 }

@@ -22,6 +22,6 @@ FORMS += mainwindow.ui \
     limits.ui
 SOURCES += File.cpp main.cpp mainwindow.cpp serial.cpp toolMenu.cpp menuBar.cpp testProperties.cpp database.cpp sqlite3.c
 TRANSLATIONS += Zahoreni_zdroju_cs_CZ.ts
-RC_ICONS = .\src\tse.ico
+RC_ICONS = .\release\.src\tse.ico
 
 DISTFILES +=

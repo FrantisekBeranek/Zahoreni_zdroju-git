@@ -55,8 +55,11 @@ QString testProperties::getPath()
             "Vytvořit soubor", defaultName,
             "PDF File (*.pdf);;All Files (*)");
     }
-    confFile.setDefaultPath(path);
-
+    if (path != nullptr)
+    {
+        confFile.setDefaultPath(path);
+    }
+    
     return path;
 }
 
