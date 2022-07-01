@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     file = new File;
     connect(file, SIGNAL(calibrationOver()), this, SLOT(endCalibration()));
+    connect(file, SIGNAL(calibrationCancelled()), this, SLOT(endCalibration()));
 
     status.calibInProgress = 0;
     status.COMstate = PORT_DISCONNECTED;
@@ -189,7 +190,7 @@ void MainWindow::startManage()
     
 
     testProperties* properties = new testProperties;
-    if(properties->init(supplyCount, file->getWorkersPath(), file->getDefaultPath(), suppliesToTest_pointers) == false)
+    if(properties->init(supplyCount, suppliesToTest_pointers) == false)
     {
         delete properties;
         return;
@@ -206,7 +207,7 @@ void MainWindow::startManage()
     //---Vytvoř a otevři soubor (režim ReadWrite)---//
     if(!path.isEmpty()){
         if(file->createFile(path)){ 
-            db->writeNewSupply(properties->retSerialNumber(), properties->retWorker(), (QDateTime::currentDateTime()).toString("dd.MM.yyyy"));
+            db->writeNewSupply(properties->retSerialNumber(), properties->retWorker(), (QDateTime::currentDateTime()).toString("yyyy-mm-dd hh:mm:ss:sss"));
             //---odešli příkaz k zahájení testu---//
             if(QMessageBox::information(this, "Zahoření zdrojů",
             "Připojte a spustě testovaný zdroj\nPoté stiskněte OK pro pokračování",
@@ -339,6 +340,12 @@ void MainWindow::calibrationFailure(){
     emit statusChanged(status);
 }
 
+//_____Ukončení kalibrace uživatelem_____//
+void MainWindow::cancelCalibration(){
+    status.calibInProgress = false;
+    emit statusChanged(status);
+}
+
 //_____Úspěšné dokončení kalibrace_____//
 void MainWindow::endCalibration(){
     QMessageBox::information(this, "Kalibrace", "Kalibrace proběhla úspěšně.", QMessageBox::Ok);
@@ -392,7 +399,7 @@ void MainWindow::testPhaseManage(char phase)
         break;
 
     case 'b':   //Baterie start
-        ui->testPhase->setText("Fáze testu: Spouštění měření baterie");
+        ui->testPhase->setText("Fáze testu: Hlavní test baterie v průběhu");
         break;
 
     case 'M':   //Hlavní test baterie

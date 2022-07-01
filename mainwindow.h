@@ -84,6 +84,7 @@ public slots:
     };
     void read();
     void calibrationFailure();
+    void cancelCalibration();
     void endCalibration();
     void endMeasure(bool);
     void endMeasure();

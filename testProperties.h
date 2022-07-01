@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QDateTime>
 #include <QFileDialog>
+#include "File.h"
 
 class testProperties
 {
@@ -17,8 +18,8 @@ private:
     int pointer;
     
     QString getSerialNumber();
-    QString getPath(QString);
-    QString getWorker(QString);
+    QString getPath();
+    QString getWorker();
     int getPointer(int, std::vector<int> allreadySet);
 
 public:
@@ -27,7 +28,7 @@ public:
         : serialNumber{inSerialNumber}, path{inPath}, worker{inWorker}, pointer{inPointer} {};
     //~testProperties();
 
-    bool init(int supplyCount, QString workersPath, QString defaultPath, std::vector<int> allreadySet);
+    bool init(int supplyCount, std::vector<int> allreadySet);
     QString retPath(){return path;};
     QString retSerialNumber(){return serialNumber;};
     QString retWorker(){return worker;};

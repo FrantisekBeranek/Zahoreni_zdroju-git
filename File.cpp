@@ -5,20 +5,31 @@
 File::File()
 {
     //---Nastavení cesty k souboru meze podle domovského adresáře---//
-    QString appDirPath = QCoreApplication::applicationDirPath().section('/', 0, -1).append("/.src/");
-    QString tmp = appDirPath;
-    limitsFile.setFileName(tmp.append(limitsPath));
-    if(!limitsFile.exists())
+    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/");
+    JSON_handler confFile;
+    if(!confFile.fileCheck())
     {
         QMessageBox::critical(nullptr, "Chyba souborového systému!",
             "Důležité soubory neexistují, nebo byly přesunuty", QMessageBox::Ok);
-    }  
+            //Pokud se soubory nenajdou, zobrazit confused Travoltu
+        // Load animated GIF
+        QMovie* movie = new QMovie(QString("200.gif").prepend(srcDirPath));
 
-    //___Úprava zbylých cest___//
-    defaultPath.prepend(appDirPath);
-    calibPath.prepend(appDirPath);
-    patternPath.prepend(appDirPath);
-    workersPath.prepend(appDirPath);
+        // Make sure the GIF was loaded correctly
+        if (movie->isValid()) 
+        {
+            // Play GIF
+            QLabel* label = new QLabel(nullptr);
+            label->setMovie(movie);
+            movie->start();
+            label->show();
+        }
+    }  
+    else
+    {
+        //___Úprava zbylých cest___//
+        patternPath.prepend(srcDirPath);
+    }
 
     logFile = new QFile;
 }
@@ -44,18 +55,6 @@ int File::createFile(QString path)
         return 0;
     }
 
-    //___Přepsání výchozí adresy pro ukládání protokolů___//
-    QString defaultDir = dir.absoluteFilePath(path);
-    defaultDir = defaultDir.section('/', 0, -2);
-    defaultDir.append("/");
-    QFile file;
-    file.setFileName(defaultPath);
-    if(file.open(QIODevice::WriteOnly) | QIODevice::Truncate)
-    {
-        file.write(defaultDir.toLatin1());
-        file.close();
-    }
-
     //----------------PDF--------------------//
 
     doc = new QTextDocument;
@@ -65,27 +64,11 @@ int File::createFile(QString path)
     return 1;
 }
 
-//_____Načtení převodních konstant_____//
-bool File::getConstants()
-{
-    QFile calibFile;
-    calibFile.setFileName(calibPath);
-    if(calibFile.open(QIODevice::ReadOnly)){
-        QTextStream in(&calibFile);
-        QString calibData = in.readLine();
-        for (int i = 0; i < 7; i++)
-        {
-            transfer[i] = calibData.section(';', i, i).toDouble();
-        }
-        return true;
-    }
-    return false;
-}
-
 //_____Převod z hodnot ADC na napětí_____//
 bool File::makeValues(unsigned int* valuesADC, float* valuesFloat)
 {
-    if(!getConstants()) //Načtení převodních konstant
+    JSON_handler confFile;
+    if(!confFile.getConstants(this->transfer)) //Načtení převodních konstant
         return false;
     for (int i = 0; i < MEAS_TYPES_COUNT; i++)
     {
@@ -101,16 +84,18 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
     static bool bat = false;
     unsigned int retVal = 0;
     this->setFileName(path);
-    QTextStream out2(this), meze(&limitsFile);
+    QTextStream out2(this);
 
     QString divLine = "+---------+---------+---------+---------+---------+---------+---------+---------+\n";
 
     if(this->isOpen())
         this->close();
-    if(limitsFile.isOpen())
-        limitsFile.close();
 
-    retVal = this->open(QIODevice::WriteOnly | QIODevice::Append) | (limitsFile.open(QIODevice::ReadOnly) << 1);
+    std::vector<double> limits_open, limits_short;
+
+    JSON_handler confFile;
+
+    retVal = this->open(QIODevice::WriteOnly | QIODevice::Append) | (confFile.getLimits(&limits_open, &limits_short) << 1);
         //3 -> vše v pořádku
         //2 -> chyba protokolu
         //1 -> chyba limitsfile
@@ -162,32 +147,20 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
         out2 << '|' << testName << '|';
 
         for(int i = 0; i < MEAS_TYPES_COUNT; i++){
-            //---Načti a zpracuj limitní hodnoty---//
-            QString limitsLine = meze.readLine();
 
-            if(bat)
-            {
-                i = 4;
-                for (int j = 0; j < i-1; j++)
-                {
-                    limitsLine = meze.readLine();
-                }
-                
-            }
-            
             double max, min;
             QString numString;
             numString = QString::number(values[i], 10, 2);
             if(testNum == 0){
                 //---První měření, tj. zdroj naprázdno---//
-                max = limitsLine.section(';', 0, 0).toDouble();
-                min = limitsLine.section(';', 1, 1).toDouble();
+                max = limits_open.at(2*i);
+                min = limits_open.at(2*i+1);
             }
             else
             {
                 //---Další měření, tj. zdroj v zátěži---//
-                max = limitsLine.section(';', 2, 2).toDouble();
-                min = limitsLine.section(';', 3, 3).toDouble();
+                max = limits_short.at(2*i);
+                min = limits_short.at(2*i+1);
             }
             //---Vyhodnoť a převeď data---//
             if((values[i] < min || values[i] > max) && bat == false){
@@ -220,7 +193,6 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
             if(bat)
                 break;
         }
-        meze.seek(0);
         out2 << "\n";
 
         this->close();
@@ -254,8 +226,6 @@ int File::makeProtocol()
 
     QString divLine = "+---------+---------+\n";
     this->setFileName(path);
-    if(limitsFile.isOpen())
-        limitsFile.close();
     if(this->isOpen())
         this->close();
 
@@ -313,125 +283,32 @@ int File::makeProtocol()
 bool File::limitsCheck()
 {
     bool ret;
-    limitsFile.setFileName(limitsPath);
-    ret = limitsFile.open(QIODevice::ReadOnly);
-    ret = ret && limitsFile.size();
-    limitsFile.close();
+    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/");
+    QFile confFile;
+    confFile.setFileName(QString("config.json").prepend(srcDirPath));
+    ret = confFile.open(QIODevice::ReadOnly);
+    confFile.close();
     return ret;
 }
 
 //_____Uložení hodnot limit z formuláře do souboru_____//
 void File::saveLimits()
 {
-    if(limitsFile.isOpen())
-        limitsFile.close();
-    if(limitsFile.open(QIODevice::WriteOnly | QIODevice::Truncate)){
-        QTextStream out(&limitsFile);
-        //---Přečti a ulož hodnoty z formuláře---//
-        out << (QString::number(Form->ui->fiveVoltsMax->value())).append(';');
-        out << (QString::number(Form->ui->fiveVoltsMin->value())).append(';');
-        out << (QString::number(Form->ui->fiveVoltsMaxShort->value())).append(';');
-        out << (QString::number(Form->ui->fiveVoltsMinShort->value())).append(';');
-        out << '\n';
-        out << (QString::number(Form->ui->fiveVoltsConMax->value())).append(';');
-        out << (QString::number(Form->ui->fiveVoltsConMin->value())).append(';');
-        out << (QString::number(Form->ui->fiveVoltsConMaxShort->value())).append(';');
-        out << (QString::number(Form->ui->fiveVoltsConMinShort->value())).append(';');
-        out << '\n';
-        out << (QString::number(Form->ui->twelveVoltsMax->value())).append(';');
-        out << (QString::number(Form->ui->twelveVoltsMin->value())).append(';');
-        out << (QString::number(Form->ui->twelveVoltsMaxShort->value())).append(';');
-        out << (QString::number(Form->ui->twelveVoltsMinShort->value())).append(';');
-        out << '\n';
-        out << (QString::number(Form->ui->fifteenVoltsMax->value())).append(';');
-        out << (QString::number(Form->ui->fifteenVoltsMin->value())).append(';');
-        out << (QString::number(Form->ui->fifteenVoltsMaxShort->value())).append(';');
-        out << (QString::number(Form->ui->fifteenVoltsMinShort->value())).append(';');
-        out << '\n';
-        out << (QString::number(Form->ui->ubatMax->value())).append(';');
-        out << (QString::number(Form->ui->ubatMin->value())).append(';');
-        out << (QString::number(Form->ui->ubatMaxShort->value())).append(';');
-        out << (QString::number(Form->ui->ubatMinShort->value())).append(';');
-        out << '\n';
-        out << (QString::number(Form->ui->twentyfourVoltsMax->value())).append(';');
-        out << (QString::number(Form->ui->twentyfourVoltsMin->value())).append(';');
-        out << (QString::number(Form->ui->twentyfourVoltsMaxShort->value())).append(';');
-        out << (QString::number(Form->ui->twentyfourVoltsMinShort->value())).append(';');
-        out << '\n';
-        out << (QString::number(Form->ui->oxyMax->value())).append(';');
-        out << (QString::number(Form->ui->oxyMin->value())).append(';');
-        out << (QString::number(Form->ui->oxyMaxShort->value())).append(';');
-        out << (QString::number(Form->ui->oxyMinShort->value())).append(';');
-
-
-        //---Uveď vše do původního stavu---//
-        limitsFile.close();
-        disconnect(Form, SIGNAL(accepted()), this, SLOT(saveLimits()));
-        delete(Form);
-    }
-    else
-    {
-        QMessageBox::warning(nullptr, "Nastavení mezí", "Nedošlo k uložení hodnot", QMessageBox::Ok);
-    }
+    JSON_handler confFile;
+    confFile.saveLimits(Form);
+    disconnect(Form, SIGNAL(accepted()), this, SLOT(saveLimits()));
+    delete(Form);
 }
 
 //_____Vytvoření formuláře pro nastavení mezních hodnot_____//
 bool File::limitsSetup()
 {
-    limitsFile.setFileName(limitsPath);
-
     //---Vytvořit okno s formulářem pro nastavení---//
     Form = new limits;
     Form->setWindowTitle("Nastavení mezních hodnot");
     //---Výchozí hodnoty nastav dle existujících hodnot---//
-    if(limitsFile.open(QIODevice::ReadOnly))
-    {
-        //___Nastavení současných hodnot jako výchozích___//
-        double val[MEAS_TYPES_COUNT][4];
-        for(int i = 0; i < MEAS_TYPES_COUNT; i++)
-        {
-            QString line = limitsFile.readLine();
-            for (int j = 0; j < 4; j++)
-            {
-                val[i][j] = line.section(';', j, j).toDouble();
-            }   
-        }
-        Form->ui->fiveVoltsConMax->setValue(val[0][0]);
-        Form->ui->fiveVoltsConMin->setValue(val[0][1]);
-        Form->ui->fiveVoltsConMaxShort->setValue(val[0][2]);
-        Form->ui->fiveVoltsConMinShort->setValue(val[0][3]);
-
-        Form->ui->fiveVoltsMax->setValue(val[1][0]);
-        Form->ui->fiveVoltsMin->setValue(val[1][1]);
-        Form->ui->fiveVoltsMaxShort->setValue(val[1][2]);
-        Form->ui->fiveVoltsMinShort->setValue(val[1][3]);
-        
-        Form->ui->twelveVoltsMax->setValue(val[2][0]);
-        Form->ui->twelveVoltsMin->setValue(val[2][1]);
-        Form->ui->twelveVoltsMaxShort->setValue(val[2][2]);
-        Form->ui->twelveVoltsMinShort->setValue(val[2][3]);
-        
-        Form->ui->fifteenVoltsMax->setValue(val[3][0]);
-        Form->ui->fifteenVoltsMin->setValue(val[3][1]);
-        Form->ui->fifteenVoltsMaxShort->setValue(val[3][2]);
-        Form->ui->fifteenVoltsMinShort->setValue(val[3][3]);
-        
-        Form->ui->ubatMax->setValue(val[4][0]);
-        Form->ui->ubatMin->setValue(val[4][1]);
-        Form->ui->ubatMaxShort->setValue(val[4][2]);
-        Form->ui->ubatMinShort->setValue(val[4][3]);
-        
-        Form->ui->twentyfourVoltsMax->setValue(val[5][0]);
-        Form->ui->twentyfourVoltsMin->setValue(val[5][1]);
-        Form->ui->twentyfourVoltsMaxShort->setValue(val[5][2]);
-        Form->ui->twentyfourVoltsMinShort->setValue(val[5][3]);
-        
-        Form->ui->oxyMax->setValue(val[6][0]);
-        Form->ui->oxyMin->setValue(val[6][1]);
-        Form->ui->oxyMaxShort->setValue(val[6][2]);
-        Form->ui->oxyMinShort->setValue(val[6][3]);
-    }
-    limitsFile.close();
+    JSON_handler confFile;
+    confFile.setLimits(Form);
     //---Po potvrzení zapsat hodnoty do souboru---//
     connect(Form, SIGNAL(accepted()), this, SLOT(saveLimits()));
     //---Spušť formulář---//
@@ -462,34 +339,33 @@ void File::calibration(unsigned int* values)
     bool Ok;
 
     //___Otevření souboru___//
-    QFile calibFile;
-    calibFile.setFileName(calibPath);
-    if(calibFile.open(QIODevice::WriteOnly | QIODevice::Truncate)){
-                
-        QTextStream out(&calibFile);
+    JSON_handler confFile;
+    if(confFile.fileCheck()){
 
-        for (int i = 0; i < 7; i++)
+        double constants[MEAS_TYPES_COUNT];
+        for (int i = 0; i < MEAS_TYPES_COUNT; i++)
         {
             voltages[i].prepend("Změřte napětí ");
             double refValue = QInputDialog::getDouble(nullptr, "Kalibrace", 
                     voltages[i], voltagesNum[i], voltagesNum[i] - 2, voltagesNum[i] + 2, 1, &Ok);
             if(Ok){
                 //Přepočti na konstantu
-                double constant = refValue/values[i];
-                out << constant << ';';
+                constants[i] = refValue/values[i];
             }
             else
             {
                 if (QMessageBox::question(nullptr, "Kalibrace", "Opravdu chtete ukončit kalibraci?\nStávající hodnoty budou odstraněny!",
                     QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok){
-                        break;
+                        emit calibrationCancelled();
+                        return;
                     }
             }
             
         } 
-
-        calibFile.close();
-        emit calibrationOver();
+        if(confFile.saveConstants(constants))
+            emit calibrationOver();
+        else
+            QMessageBox::warning(nullptr, "Kalibrace", "Nepodařilo se zapsat hodnoty", QMessageBox::Ok);
     }
 }
 
@@ -630,4 +506,328 @@ void File::removeAll()
         logFile->remove();
         delete logFile;
     }
+}
+
+//===Práce s JSON souborem pro configuraci===//
+JSON_handler::JSON_handler()
+{
+    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/config.json");
+    path = srcDirPath;
+    confFile.setFileName(srcDirPath);
+}
+
+void JSON_handler::setFileName(QString fileName)
+{
+    this->path = fileName;
+}
+
+bool JSON_handler::fileCheck()
+{
+    confFile.setFileName(path);
+    return confFile.exists();
+}
+
+void JSON_handler::getWorkers(QStringList* workers)
+{
+    workers->clear();
+    if(confFile.open(QIODevice::ReadOnly))
+    {
+        QString data = (QString)confFile.readAll();
+        confFile.close();
+        QJsonDocument confDoc = QJsonDocument::fromJson(data.toUtf8());
+        QJsonObject confObj = confDoc.object();
+        QJsonArray workersArray = confObj.value("workers").toArray();
+        for (int i = 0; i < workersArray.size(); i++)
+        {
+            workers->push_back(workersArray.at(i).toString());
+        } 
+    }
+}
+
+void JSON_handler::addWorker(QString newWorker)
+{
+    if(confFile.open(QIODevice::ReadWrite))
+    {
+        QByteArray data = confFile.readAll();
+        QJsonDocument confDoc = QJsonDocument::fromJson(data);
+        QJsonObject confObj = confDoc.object();
+        QJsonArray workersArray = confObj.value("workers").toArray();
+        QJsonValue workerValue = QJsonValue(newWorker);
+        workersArray.push_back(workerValue);
+        confObj.insert("workers", workersArray);
+        confDoc.setObject(confObj);
+        confFile.resize(0);
+        confFile.write(confDoc.toJson());
+        confFile.close();
+    }
+}
+
+void JSON_handler::saveLimits(limits* Form)
+{
+    if(confFile.open(QIODevice::ReadWrite))
+    {
+        QByteArray data = confFile.readAll();
+        QJsonDocument confDoc = QJsonDocument::fromJson(data);
+        QJsonObject confObj = confDoc.object();
+        QJsonObject limitsObj = confObj.value("limits").toObject();
+        
+        QJsonObject twelveVolts = limitsObj.value("12Volts").toObject();
+        twelveVolts.insert("maxOpen", Form->ui->twelveVoltsMax->value());
+        twelveVolts.insert("minOpen", Form->ui->twelveVoltsMin->value());
+        twelveVolts.insert("max", Form->ui->twelveVoltsMaxShort->value());
+        twelveVolts.insert("min", Form->ui->twelveVoltsMinShort->value());
+        limitsObj.insert("12Volts", twelveVolts);
+        
+        QJsonObject fifteenVolts = limitsObj.value("15Volts").toObject();
+        fifteenVolts.insert("maxOpen", Form->ui->fifteenVoltsMax->value());
+        fifteenVolts.insert("minOpen", Form->ui->fifteenVoltsMin->value());
+        fifteenVolts.insert("max", Form->ui->fifteenVoltsMaxShort->value());
+        fifteenVolts.insert("min", Form->ui->fifteenVoltsMinShort->value());
+        limitsObj.insert("15Volts", fifteenVolts);
+        
+        QJsonObject twentyFourVolts = limitsObj.value("24Volts").toObject();
+        twentyFourVolts.insert("maxOpen", Form->ui->twentyfourVoltsMax->value());
+        twentyFourVolts.insert("minOpen", Form->ui->twentyfourVoltsMin->value());
+        twentyFourVolts.insert("max", Form->ui->twentyfourVoltsMaxShort->value());
+        twentyFourVolts.insert("min", Form->ui->twentyfourVoltsMinShort->value());
+        limitsObj.insert("24Volts", twentyFourVolts);
+        
+        QJsonObject twentyFourVolts_oxy = limitsObj.value("24VoltsOxy").toObject();
+        twentyFourVolts_oxy.insert("maxOpen", Form->ui->oxyMax->value());
+        twentyFourVolts_oxy.insert("minOpen", Form->ui->oxyMin->value());
+        twentyFourVolts_oxy.insert("max", Form->ui->oxyMaxShort->value());
+        twentyFourVolts_oxy.insert("min", Form->ui->oxyMinShort->value());
+        limitsObj.insert("24VoltsOxy", twentyFourVolts_oxy);
+        
+        QJsonObject kon = limitsObj.value("5VoltKon").toObject();
+        kon.insert("maxOpen", Form->ui->fiveVoltsConMax->value());
+        kon.insert("minOpen", Form->ui->fiveVoltsConMin->value());
+        kon.insert("max", Form->ui->fiveVoltsConMaxShort->value());
+        kon.insert("min", Form->ui->fiveVoltsConMinShort->value());
+        limitsObj.insert("5VoltKon", kon);
+        
+        QJsonObject five = limitsObj.value("5Volts").toObject();
+        five.insert("maxOpen", Form->ui->fiveVoltsMax->value());
+        five.insert("minOpen", Form->ui->fiveVoltsMin->value());
+        five.insert("max", Form->ui->fiveVoltsMaxShort->value());
+        five.insert("min", Form->ui->fiveVoltsMinShort->value());
+        limitsObj.insert("5Volts", five);
+        
+        QJsonObject batt = limitsObj.value("battery").toObject();
+        batt.insert("maxOpen", Form->ui->ubatMax->value());
+        batt.insert("minOpen", Form->ui->ubatMin->value());
+        batt.insert("max", Form->ui->ubatMaxShort->value());
+        batt.insert("min", Form->ui->ubatMinShort->value());
+        limitsObj.insert("battery", batt);
+
+        confObj.insert("limits", limitsObj);
+        confDoc.setObject(confObj);
+        confFile.resize(0);
+        confFile.write(confDoc.toJson());
+        confFile.close();
+    }
+    else
+    {
+        QMessageBox::warning(nullptr, "Nastavení mezí", "Nedošlo k uložení hodnot", QMessageBox::Ok);
+    }
+}
+
+void JSON_handler::setLimits(limits* Form)
+{
+    if(confFile.open(QIODevice::ReadOnly))
+    {
+        QString data = (QString)confFile.readAll();
+        confFile.close();
+        QJsonDocument confDoc = QJsonDocument::fromJson(data.toUtf8());
+        QJsonObject confObj = confDoc.object();
+        QJsonObject limitsObj = confObj.value("limits").toObject();
+
+        QJsonObject fiveVoltsCon = limitsObj.value("5VoltKon").toObject();
+        Form->ui->fiveVoltsConMax->setValue(fiveVoltsCon.value("maxOpen").toDouble());
+        Form->ui->fiveVoltsConMin->setValue(fiveVoltsCon.value("minOpen").toDouble());
+        Form->ui->fiveVoltsConMaxShort->setValue(fiveVoltsCon.value("max").toDouble());
+        Form->ui->fiveVoltsConMinShort->setValue(fiveVoltsCon.value("min").toDouble());
+        
+        QJsonObject fiveVolts = limitsObj.value("5Volts").toObject();
+        Form->ui->fiveVoltsMax->setValue(fiveVolts.value("maxOpen").toDouble());
+        Form->ui->fiveVoltsMin->setValue(fiveVolts.value("minOpen").toDouble());
+        Form->ui->fiveVoltsMaxShort->setValue(fiveVolts.value("max").toDouble());
+        Form->ui->fiveVoltsMinShort->setValue(fiveVolts.value("min").toDouble());
+        
+        QJsonObject twelve = limitsObj.value("12Volts").toObject();
+        Form->ui->twelveVoltsMax->setValue(twelve.value("maxOpen").toDouble());
+        Form->ui->twelveVoltsMin->setValue(twelve.value("minOpen").toDouble());
+        Form->ui->twelveVoltsMaxShort->setValue(twelve.value("max").toDouble());
+        Form->ui->twelveVoltsMinShort->setValue(twelve.value("min").toDouble());
+        
+        QJsonObject fifteen = limitsObj.value("15Volts").toObject();
+        Form->ui->fifteenVoltsMax->setValue(fifteen.value("maxOpen").toDouble());
+        Form->ui->fifteenVoltsMin->setValue(fifteen.value("minOpen").toDouble());
+        Form->ui->fifteenVoltsMaxShort->setValue(fifteen.value("max").toDouble());
+        Form->ui->fifteenVoltsMinShort->setValue(fifteen.value("min").toDouble());
+        
+        QJsonObject uBat = limitsObj.value("battery").toObject();
+        Form->ui->ubatMax->setValue(uBat.value("maxOpen").toDouble());
+        Form->ui->ubatMin->setValue(uBat.value("minOpen").toDouble());
+        Form->ui->ubatMaxShort->setValue(uBat.value("max").toDouble());
+        Form->ui->ubatMinShort->setValue(uBat.value("min").toDouble());
+        
+        QJsonObject twentyFour = limitsObj.value("24Volts").toObject();
+        Form->ui->twentyfourVoltsMax->setValue(twentyFour.value("maxOpen").toDouble());
+        Form->ui->twentyfourVoltsMin->setValue(twentyFour.value("minOpen").toDouble());
+        Form->ui->twentyfourVoltsMaxShort->setValue(twentyFour.value("max").toDouble());
+        Form->ui->twentyfourVoltsMinShort->setValue(twentyFour.value("min").toDouble());
+        
+        QJsonObject oxy = limitsObj.value("24VoltsOxy").toObject();
+        Form->ui->oxyMax->setValue(oxy.value("maxOpen").toDouble());
+        Form->ui->oxyMin->setValue(oxy.value("minOpen").toDouble());
+        Form->ui->oxyMaxShort->setValue(oxy.value("max").toDouble());
+        Form->ui->oxyMinShort->setValue(oxy.value("min").toDouble()); 
+    }
+}
+
+bool JSON_handler::getLimits(std::vector<double>* limits_open, std::vector<double>* limits_short)
+{
+    limits_open->clear();
+    limits_short->clear();
+    if(confFile.open(QIODevice::ReadOnly))
+    {
+        QString data = (QString)confFile.readAll();
+        confFile.close();
+        QJsonDocument confDoc = QJsonDocument::fromJson(data.toUtf8());
+        QJsonObject confObj = confDoc.object();
+        QJsonObject limitsObj = confObj.value("limits").toObject();
+
+        QJsonObject fiveVoltsCon = limitsObj.value("5VoltKon").toObject();
+        limits_open->push_back(fiveVoltsCon.value("maxOpen").toDouble());
+        limits_open->push_back(fiveVoltsCon.value("minOpen").toDouble());
+        limits_short->push_back(fiveVoltsCon.value("max").toDouble());
+        limits_short->push_back(fiveVoltsCon.value("min").toDouble());
+        
+        QJsonObject fiveVolts = limitsObj.value("5Volts").toObject();
+        limits_open->push_back(fiveVolts.value("maxOpen").toDouble());
+        limits_open->push_back(fiveVolts.value("minOpen").toDouble());
+        limits_short->push_back(fiveVolts.value("max").toDouble());
+        limits_short->push_back(fiveVolts.value("min").toDouble());
+        
+        QJsonObject twelve = limitsObj.value("12Volts").toObject();
+        limits_open->push_back(twelve.value("maxOpen").toDouble());
+        limits_open->push_back(twelve.value("minOpen").toDouble());
+        limits_short->push_back(twelve.value("max").toDouble());
+        limits_short->push_back(twelve.value("min").toDouble());
+        
+        QJsonObject fifteen = limitsObj.value("15Volts").toObject();
+        limits_open->push_back(fifteen.value("maxOpen").toDouble());
+        limits_open->push_back(fifteen.value("minOpen").toDouble());
+        limits_short->push_back(fifteen.value("max").toDouble());
+        limits_short->push_back(fifteen.value("min").toDouble());
+        
+        QJsonObject uBat = limitsObj.value("battery").toObject();
+        limits_open->push_back(uBat.value("maxOpen").toDouble());
+        limits_open->push_back(uBat.value("minOpen").toDouble());
+        limits_short->push_back(uBat.value("max").toDouble());
+        limits_short->push_back(uBat.value("min").toDouble());
+        
+        QJsonObject twentyFour = limitsObj.value("24Volts").toObject();
+        limits_open->push_back(twentyFour.value("maxOpen").toDouble());
+        limits_open->push_back(twentyFour.value("minOpen").toDouble());
+        limits_short->push_back(twentyFour.value("max").toDouble());
+        limits_short->push_back(twentyFour.value("min").toDouble());
+        
+        QJsonObject oxy = limitsObj.value("24VoltsOxy").toObject();
+        limits_open->push_back(oxy.value("maxOpen").toDouble());
+        limits_open->push_back(oxy.value("minOpen").toDouble());
+        limits_short->push_back(oxy.value("max").toDouble());
+        limits_short->push_back(oxy.value("min").toDouble()); 
+        
+        return true;
+    }
+    else
+        return false;
+}
+
+QString JSON_handler::getDefaultPath()
+{
+    if(confFile.open(QIODevice::ReadOnly))
+    {
+        QString data = (QString)confFile.readAll();
+        confFile.close();
+        QJsonDocument confDoc = QJsonDocument::fromJson(data.toUtf8());
+        if(!confDoc.isObject()){
+            return nullptr;
+        }
+        QJsonObject confObj = confDoc.object();
+        return confObj.value("defaultPath").toString();
+    }
+    else
+        return nullptr;
+}
+
+void JSON_handler::setDefaultPath(QString fileName)
+{
+    QString defaultDir = fileName.section('/', 0, -2).append("/");
+    if(confFile.open(QIODevice::ReadWrite))
+    {
+        QString data = (QString)confFile.readAll();
+        QJsonDocument confDoc = QJsonDocument::fromJson(data.toUtf8());
+        if(!confDoc.isObject()){
+            QMessageBox::information(nullptr, "defaultPath", "fuky fuk", QMessageBox::Ok);
+            return;
+        }
+        QJsonObject confObj = confDoc.object();
+        confObj.insert("defaultPath", defaultDir);
+        confDoc.setObject(confObj);
+        confFile.resize(0);
+        confFile.write(confDoc.toJson());
+        confFile.close();
+    }
+}
+
+bool JSON_handler::getConstants(double* constantsValues)
+{
+    if (confFile.open(QIODevice::ReadOnly))
+    {
+        QString data = (QString)confFile.readAll();
+        confFile.close();
+        QJsonDocument confDoc = QJsonDocument::fromJson(data.toUtf8());
+        if(!confDoc.isObject())
+            return false;
+        QJsonObject confObj = confDoc.object();
+        QJsonArray constants = confObj.value("calibration").toArray();
+        if(MEAS_TYPES_COUNT != constants.size())
+            return false;
+        for (int i = 0; i < constants.size(); i++)
+        {
+            constantsValues[i] = constants.at(i).toDouble();
+        }
+        
+        return true;
+    }
+    else
+        return false;
+}
+
+bool JSON_handler::saveConstants(double* constants)
+{
+    if(confFile.open(QIODevice::ReadWrite))
+    {
+        QByteArray data = confFile.readAll();
+        QJsonDocument confDoc = QJsonDocument::fromJson(data);
+        QJsonObject confObj = confDoc.object();
+        QJsonArray constantsArray = confObj.value("calibration").toArray();
+        /*if(MEAS_TYPES_COUNT != constantsArray.size())
+            return false;*/
+        for (int i = 0; i < MEAS_TYPES_COUNT; i++)
+        {
+            constantsArray.replace(i, QJsonValue(constants[i]));
+            //constantsArray.at(i).toDouble(constants[i]);
+        }
+        confObj.insert("calibration", constantsArray);
+        confDoc.setObject(confObj);
+        confFile.resize(0);
+        confFile.write(confDoc.toJson());
+        confFile.close();
+        return true;
+    }
+    return false;
 }
