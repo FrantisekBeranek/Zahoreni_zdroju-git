@@ -63,7 +63,7 @@ bool Serial::connectPort(QString portName){
             break;
         case 6:
         errorMessage = "BreakConditionError";
-        break;
+            break;
         case 7:
             errorMessage = "WriteError";
             break;

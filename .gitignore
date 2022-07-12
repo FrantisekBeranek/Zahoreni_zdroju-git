@@ -1,2 +1,8 @@
-
-*.pdf
+Protokoly/
+*.o
+Makefile
+*.Debug
+*.Release
+release/
+debug/
+.vscode/

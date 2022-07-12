@@ -4,15 +4,14 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "D:/Qt/5.14.2/mingw73_64/include/**",
-                "C:\\sqlite-amalgamation-3380200\\**"
+                "D:/Qt/5.15.2/mingw81_64/include/**"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "D:/Qt/Tools/mingw730_64/bin/gcc.exe",
+            "compilerPath": "D:/Qt/Tools/mingw810_64/bin/gcc.exe",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
