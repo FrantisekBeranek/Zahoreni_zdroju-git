@@ -8,9 +8,14 @@ Serial::Serial()
 
     //___Timer pro indikaci chyby připojení portu___//
     serialTimer = new QTimer;
-    serialTimer->setSingleShot(true);
+    serialTimer->setSingleShot(false);
     serialTimer->setInterval(1100);
     connect(serialTimer, SIGNAL(timeout()), this, SLOT(serialError()));
+
+    if(autoConnectEnabled)
+    {
+        serialTimer->start();
+    }
 }
 
 //_____Destruktor_____//
@@ -35,7 +40,7 @@ bool Serial::connectPort(QString portName){
     {
         serialTimer->start();
         serialConnected = true;
-        status = PORT_OK;
+        status = PORT_CONNECTING;
         writePaket(CON_PAKET, 0);
     }
     else{
@@ -89,6 +94,7 @@ bool Serial::connectPort(QString portName){
         QMessageBox::warning(nullptr, tr("Zahoreni"), tr("Nepodařilo se otevřít COM port\n %1").arg(errorMessage), QMessageBox::Cancel);
         serialConnected = false;
         status = PORT_DISCONNECTED;
+        serialTimer->stop();
     }
 
     emit statusChanged(this);
@@ -110,10 +116,36 @@ void Serial::closePort()
 //_____Chyba připojení portu (přípravek se neozývá)_____//
 void Serial::serialError()
 {
-    serialTimer->stop();
-    status = PORT_UNACTIVE;
+    if (autoConnectEnabled)
+    {
+        if(serialConnected)
+        {
+            status = PORT_UNACTIVE;
+            emit connectionLost();
+        }
+        else
+            status = PORT_DISCONNECTED;
+        QList<QSerialPortInfo>unconnectedPorts = QSerialPortInfo::availablePorts();
+        if(unconnectedPorts.count())
+        {
+            //___Vytvoření seznamu jmen portů___//
+            foreach(QSerialPortInfo portInfo, unconnectedPorts)
+            {
+                if(portInfo.vendorIdentifier() == 1155 && portInfo.productIdentifier() == 22336)
+                {
+                    connectPort(portInfo.portName());
+                }
+            }
+        }
+    }
+    else
+    {
+        status = PORT_UNACTIVE;
+        serialTimer->stop();
+        emit connectionLost();
+    } 
+
     emit statusChanged(this);
-    emit connectionLost();
 }
 
 portState Serial::getStatus()
@@ -166,7 +198,7 @@ void Serial::readData()
                     //___Vymazání přijatého paketu z bufferu___//
                     for (int x = 0; x < y+2; x++)
                     {
-                        char tmp = buffer.dequeue();
+                        buffer.dequeue();
                     }
                     
                     emit paketFound(inPaket);
@@ -197,6 +229,11 @@ void portLabel::setState(Serial* port)
     case PORT_UNACTIVE:
         this->setText("COM: NEAKTIVNÍ");
         this->setStyleSheet("QLabel { color: white; background: red; font-size: 16px;}");
+        break;
+
+    case PORT_CONNECTING:
+        this->setText("COM: Připojování");
+        this->setStyleSheet("QLabel { color: white; background: orange; font-size: 16px;}");
         break;
 
     default:

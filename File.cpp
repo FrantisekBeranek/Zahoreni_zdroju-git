@@ -313,6 +313,7 @@ bool File::limitsSetup()
     connect(Form, SIGNAL(accepted()), this, SLOT(saveLimits()));
     //---Spušť formulář---//
     Form->exec();
+    return true;
 }
 
 

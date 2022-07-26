@@ -2,7 +2,7 @@
 
 menuBar :: menuBar(QMainWindow* parent) : QMenuBar(parent)
 {
-    connect(parent, SIGNAL(statusChanged()), this, SLOT(setState()));
+    connect(parent, SIGNAL(statusChanged(appStatus)), this, SLOT(setState(appStatus)));
 
     tools = new toolMenu(this);
     zahoreni = new menuZahoreni(this);

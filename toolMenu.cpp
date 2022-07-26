@@ -39,14 +39,24 @@ void COMmenu::getCOMs()
     this->addSeparator();
     disconnectAction = this->addAction("Odpojit");
     disconnectAction->setEnabled(disconnectEnabled);
+    autoConnect = this->addAction("Automatické připojování");
+    autoConnect->setCheckable(true);
+    autoConnect->setChecked(autoConnectEnabled);
 }
 
 void COMmenu::handler(QAction* action)
 {
     if(action == disconnectAction)
         emit disconnectRequest();
-    else
-        emit connectRequest(action);
+    else{
+        if (action == autoConnect)
+        {
+            autoConnectEnabled = autoConnect->isChecked();
+            emit autoConnectChanged(autoConnectEnabled);
+        }
+        else
+            emit connectRequest(action);
+    }
 }
 
 //_____TOOL MENU_____//

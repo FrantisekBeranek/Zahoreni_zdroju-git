@@ -52,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(port, SIGNAL(readyRead()), this, SLOT(read()));
     connect(port, SIGNAL(statusChanged(Serial*)), ui->COMconnected, SLOT(setState(Serial*)));
     connect(port, SIGNAL(paketFound(Paket*)), this, SLOT(managePaket(Paket*)));
+    connect(ui->menubar->tools->menuCOM, SIGNAL(autoConnectChanged(bool)), port, SLOT(setAutoConnect(bool)));
 
     timer = new QTimer;
     startTimer = nullptr;
@@ -337,12 +338,14 @@ void MainWindow::calibrationFailure(){
     QMessageBox::warning(this, "Kalibrace", "Zkontrolujte připojení přípravku a opakujte",
         QMessageBox::Ok);
     status.calibInProgress = false;
+    port->writePaket(CALIB_PAKET, 1);
     emit statusChanged(status);
 }
 
 //_____Ukončení kalibrace uživatelem_____//
 void MainWindow::cancelCalibration(){
     status.calibInProgress = false;
+    port->writePaket(CALIB_PAKET, 1);
     emit statusChanged(status);
 }
 
@@ -350,6 +353,7 @@ void MainWindow::cancelCalibration(){
 void MainWindow::endCalibration(){
     QMessageBox::information(this, "Kalibrace", "Kalibrace proběhla úspěšně.", QMessageBox::Ok);
     status.calibInProgress = false;
+    port->writePaket(CALIB_PAKET, 1);
     emit statusChanged(status);
 }
 
@@ -414,13 +418,25 @@ void MainWindow::testPhaseManage(char phase)
 //_____Datový paket_____//
 void MainWindow::dataManage(char* data, char dataLength)
 {
+    /*
+    *    U15V, U15V_CURRENT,		//kanál 7, 10
+    *    U12V, U12V_CURRENT,		//kanál 14, 12
+    *    U24VO2, U24VO2_CURRENT,	//kanál 5, 11
+    *    U24V, U24V_CURRENT,		//kanál 9, 2
+    *    U5VK, U5VK_CURRENT,		//kanál 15, 0
+    *    U5V, U5V_CURRENT,          //kanál 8, 1
+    *    U_BAT,                     //kanál 6
+    *    PAD9, PAD15,               //kanál 4, 13
+    *    U48V_CURRENT               //kanál 3
+    */
+    int swap[MEAS_TYPES_COUNT] = {3, 2, 6, 5, 0, 1, 4};
     if(dataLength == 2*MEAS_TYPES_COUNT)    // Ošetření délky dat
     {
         unsigned int values[MEAS_TYPES_COUNT] = {0};
         for (int i = 0; i < MEAS_TYPES_COUNT; i++)
         {
-            values[i] |= ((data[2*i] << 8) & 0xFF00);
-            values[i] |= (data[2*i + 1] & 0xFF);
+            values[swap[i]] |= ((data[2*i] << 8) & 0xFF00);
+            values[swap[i]] |= (data[2*i + 1] & 0xFF);
         }
 
         if(status.calibInProgress)
@@ -440,7 +456,7 @@ void MainWindow::dataManage(char* data, char dataLength)
             }
             for (unsigned int i = 0; i < MEAS_TYPES_COUNT; i++)
             {
-                QString num = QString::number(result[i], 10, 2);
+                QString num = QString::number(result[i], 10, 1);
                 QTableWidgetItem* cell = new QTableWidgetItem(num);
                 cell->setFlags(cell->flags() ^ Qt::ItemIsEditable);
                 ui->resultTable->setItem(commandNum, i, cell);
@@ -485,7 +501,7 @@ void MainWindow::dataBatManage(char* data, char dataLength)
         {
             QString num;
             if(i == 4)
-                num = QString::number(result[i], 10, 2);
+                num = QString::number(result[i], 10, 1);
             else
                 num = tr("--");
             QTableWidgetItem* cell = new QTableWidgetItem(num);
