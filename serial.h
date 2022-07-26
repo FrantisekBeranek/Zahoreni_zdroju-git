@@ -4,6 +4,7 @@
 #define MINIMUM_PAKET_SIZE 8
 
 #include "global_macros.h"
+#include "toolMenu.h"
 #include <QWidget>
 #include <QSerialPortInfo>
 #include <QSerialPort>
@@ -49,7 +50,8 @@ typedef enum{
 typedef enum{
 	PORT_OK = 0U,
 	PORT_DISCONNECTED,
-	PORT_UNACTIVE
+    PORT_UNACTIVE,
+    PORT_CONNECTING
 }portState;
 
 //_____Třída pro práci se sériovým portem_____//
@@ -59,6 +61,7 @@ class Serial : public QSerialPort
 
     QQueue<char> buffer;
     bool commandChar = false;
+	bool autoConnectEnabled = true;
 	portState status = PORT_DISCONNECTED;
     QTimer* serialTimer;
 
@@ -71,12 +74,17 @@ public:
 	void closePort();
     void readData();
 	int writePaket(outPaketType, int);
-	portState getStatus();
+    portState getStatus();
 
 public slots:
     void next(){write(QByteArray(1, 'n'));};
     void back(){write(QByteArray(1, 'b'));};
 	void serialError();
+    void setAutoConnect(bool enabled)
+    {
+        autoConnectEnabled = enabled;
+        serialTimer->start();
+    };
 
 signals:
 	void statusChanged(Serial*);

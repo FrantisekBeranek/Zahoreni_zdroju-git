@@ -9,10 +9,15 @@ class COMmenu : public QMenu
 {
     Q_OBJECT
 
+    bool autoConnectEnabled = true;
+
 public:
     COMmenu(QMenu* parent);
 
     QAction* disconnectAction;
+    QAction* autoConnect;
+    
+    bool isAutoConnectEnabled();
 
 public slots:
     void getCOMs();
@@ -20,6 +25,7 @@ public slots:
 signals:
     void connectRequest(QAction*);
     void disconnectRequest();
+    void autoConnectChanged(bool);
 };
 
 class toolMenu : public QMenu

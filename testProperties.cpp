@@ -40,9 +40,7 @@ QString testProperties::getPath()
     //___Nastavení názvu souboru___//
     QString defaultName = serialNumber + dateStr;
 
-    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/");
     JSON_handler confFile;
-    confFile.setFileName(QString("config.json").prepend(srcDirPath));
     QString defaultPath = confFile.getDefaultPath();
     //___Získání absolutní adresy nového souboru___//
     if(defaultPath != nullptr){
