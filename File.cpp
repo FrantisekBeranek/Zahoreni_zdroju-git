@@ -5,7 +5,7 @@
 File::File()
 {
     //---Nastavení cesty k souboru meze podle domovského adresáře---//
-    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/");
+    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0, -2).append("/.src/");
     JSON_handler confFile;
     if(!confFile.fileCheck())
     {
@@ -247,9 +247,9 @@ int File::makeProtocol()
         //___Nastavení formátu pdf___//
         QPrinter printer(QPrinter::PrinterResolution);
         printer.setOutputFormat(QPrinter::PdfFormat);
-        printer.setPaperSize(QPrinter::A4);
+        printer.setPageSize(QPageSize::A4);
         printer.setOutputFileName(pathPDF);
-        printer.setOrientation(QPrinter::Landscape);
+        printer.setPageOrientation(QPageLayout::Landscape);
 
         QTextDocument doc;
 
@@ -262,7 +262,7 @@ int File::makeProtocol()
 
         //___Přepsání do pdf___//
         doc.setPlainText(QString::fromLatin1(this->readAll()));
-        doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
+        doc.setPageSize(printer.pageRect(QPrinter::Millimeter).size()); // This is necessary if you want to hide the page number
         doc.print(&printer);
 
         //___Zavření a odstranění pomocného txt souboru___//
@@ -282,13 +282,8 @@ int File::makeProtocol()
 //_____Kontrola umístění souboru limits___//
 bool File::limitsCheck()
 {
-    bool ret;
-    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/");
-    QFile confFile;
-    confFile.setFileName(QString("config.json").prepend(srcDirPath));
-    ret = confFile.open(QIODevice::ReadOnly);
-    confFile.close();
-    return ret;
+    JSON_handler confFile;
+    return confFile.fileCheck();
 }
 
 //_____Uložení hodnot limit z formuláře do souboru_____//
@@ -512,7 +507,7 @@ void File::removeAll()
 //===Práce s JSON souborem pro configuraci===//
 JSON_handler::JSON_handler()
 {
-    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/config.json");
+    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0, -2).append("/.src/config.json");
     path = srcDirPath;
     confFile.setFileName(srcDirPath);
 }

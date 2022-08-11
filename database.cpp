@@ -4,7 +4,7 @@ Database::Database()
 {
     //Create connection to database
     int rc;
-    QString appDirPath = QCoreApplication::applicationDirPath().section('/', 0).append("/.src/zahorovani.db");
+    QString appDirPath = QCoreApplication::applicationDirPath().section('/', 0, -2).append("/.src/zahorovani.db");
     dbPath = appDirPath.toLocal8Bit();
     rc = sqlite3_open(dbPath.data(), &db);
     if(rc)
@@ -12,7 +12,7 @@ Database::Database()
         QMessageBox::warning(
             nullptr,    //parent
             "Zahořování zdrojů",    //title
-            "Nepodařilo se připojit k databázi", //text
+            QString("Nepodařilo se připojit k databázi %1").arg(dbPath), //text
             QMessageBox::Ok //button
             );
         return;
