@@ -125,6 +125,7 @@ void Serial::serialError()
         }
         else
             status = PORT_DISCONNECTED;
+            
         QList<QSerialPortInfo>unconnectedPorts = QSerialPortInfo::availablePorts();
         if(unconnectedPorts.count())
         {

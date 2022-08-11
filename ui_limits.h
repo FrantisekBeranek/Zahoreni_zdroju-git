@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'limits.ui'
 **
-** Created by: Qt User Interface Compiler version 5.14.2
+** Created by: Qt User Interface Compiler version 6.3.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,6 +10,7 @@
 #define UI_LIMITS_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAbstractButton>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
@@ -328,8 +329,8 @@ public:
         twentyfourVolts_oxy->setGeometry(QRect(10, 230, 55, 16));
 
         retranslateUi(limits);
-        QObject::connect(buttonBox, SIGNAL(accepted()), limits, SLOT(accept()));
-        QObject::connect(buttonBox, SIGNAL(rejected()), limits, SLOT(reject()));
+        QObject::connect(buttonBox, &QDialogButtonBox::accepted, limits, qOverload<>(&QDialog::accept));
+        QObject::connect(buttonBox, &QDialogButtonBox::rejected, limits, qOverload<>(&QDialog::reject));
 
         QMetaObject::connectSlotsByName(limits);
     } // setupUi
