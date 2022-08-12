@@ -63,6 +63,8 @@ menuZahoreni :: menuZahoreni(QMenuBar* parent) : QMenu(parent)
     this->addAction(actionSpustit);
     actionZastavit = new QAction(this);
     this->addAction(actionZastavit);
+    showLog = new QAction(this);
+    this->addAction(showLog);
     actionZm_nit_meze = new QAction(this);
     this->addAction(actionZm_nit_meze);
 
@@ -83,8 +85,12 @@ void menuZahoreni :: handler(QAction* sender)
     {
         emit stopRequest();
     }
-    else
+    else if(sender == this->actionZm_nit_meze)
     {
         emit changeLimits();
+    }
+    else
+    {
+        emit showLogRequest();
     }
 }

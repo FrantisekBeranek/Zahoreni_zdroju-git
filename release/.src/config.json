@@ -1,0 +1,60 @@
+{
+    "calibration": [
+        0.0018904320987654323,
+        0.0018943533697632058,
+        0.0046642541214314435,
+        0.006300211416490486,
+        0.003554603854389722,
+        0.0097196261682243,
+        0.009792843691148776
+    ],
+    "defaultPath": "D:/frant/Plocha/",
+    "limits": {
+        "12Volts": {
+            "max": 11.5,
+            "maxOpen": 11.5,
+            "min": 10.5,
+            "minOpen": 10.5
+        },
+        "15Volts": {
+            "max": 14.5,
+            "maxOpen": 14.5,
+            "min": 13.5,
+            "minOpen": 13.5
+        },
+        "24Volts": {
+            "max": 15,
+            "maxOpen": 15,
+            "min": 15,
+            "minOpen": 15
+        },
+        "24VoltsOxy": {
+            "max": 15,
+            "maxOpen": 15,
+            "min": 15,
+            "minOpen": 15
+        },
+        "5VoltKon": {
+            "max": 4.5,
+            "maxOpen": 4.5,
+            "min": 3.5,
+            "minOpen": 3.5
+        },
+        "5Volts": {
+            "max": 4.5,
+            "maxOpen": 4.5,
+            "min": 3.5,
+            "minOpen": 3.5
+        },
+        "battery": {
+            "max": 8.8,
+            "maxOpen": 8.8,
+            "min": 8.2,
+            "minOpen": 8.2
+        }
+    },
+    "workers": [
+        "Beranek",
+        "Troubík"
+    ]
+}

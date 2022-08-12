@@ -19,6 +19,7 @@ public:
     QAction *actionSpustit;
     QAction *actionZastavit;
     QAction *actionZm_nit_meze;
+    QAction *showLog;
 
 public slots:
     void handler(QAction*);
@@ -27,6 +28,7 @@ signals:
     void startRequest();
     void stopRequest();
     void changeLimits();
+    void showLogRequest();
 
 };
 

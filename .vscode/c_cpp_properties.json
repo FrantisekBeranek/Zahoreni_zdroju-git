@@ -11,7 +11,7 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "D:/Qt/Tools/mingw810_64/bin/gcc.exe",
+            "compilerPath": "D:/Qt/Tools/mingw1120_64/bin/gcc.exe",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"

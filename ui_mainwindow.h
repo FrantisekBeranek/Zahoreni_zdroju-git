@@ -576,7 +576,8 @@ public:
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         menubar->zahoreni->actionSpustit->setText(QCoreApplication::translate("MainWindow", "Spustit", nullptr));
         menubar->zahoreni->actionZastavit->setText(QCoreApplication::translate("MainWindow", "Zastavit", nullptr));
-        menubar->zahoreni->actionZm_nit_meze->setText(QCoreApplication::translate("MainWindow", "Zm\304\233nit meze", nullptr));
+        menubar->zahoreni->actionZm_nit_meze->setText(QCoreApplication::translate("MainWindow", "Zm\304\233nit mezní hodnoty", nullptr));
+        menubar->zahoreni->showLog->setText("Zobrazit log");
         actionOdpojit_port->setText(QCoreApplication::translate("MainWindow", "Odpojit port", nullptr));
         QTableWidgetItem *___qtablewidgetitem = resultTable->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "5V kon", nullptr));

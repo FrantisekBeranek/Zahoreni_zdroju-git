@@ -391,31 +391,6 @@ void File::writeLog(errorLogs error, int argument)
             message = QString("!!!Neúplný datový řetězec %1!!!").arg(argument);
             break;
 
-        case COM_INTERRUPTION: //Přerušení komunikace
-            message = "Přerušení spojení";
-            break;
-
-        case COM_RECONNECTION: //Obnovení komunikace
-            message = "Obnovení spojení";
-            break;
-
-        //---Chyby writeToFile---//
-        //2 -> chyba protokolu
-        //1 -> chyba limitsfile
-        //0 -> chyba všeho
-
-        case PROTOCOL_AND_LIMITS_OPEN_ERROR:
-            message = "Nepodařilo se otevřít protokol a mezní hodnoty";
-            break;
-
-        case PROTOCOL_OPEN_ERROR:
-            message = "Nepodařilo se otevřít mezní hodnoty";
-            break;
-
-        case LIMITS_OPEN_ERROR:
-            message = "Nepodařilo se otevřít protokol";
-            break;
-        
         default:
             break;
         }
@@ -440,14 +415,6 @@ void File::writeLog(errorLogs error)
         QString message;
         switch (error)
         {
-        case DATA_LOSS: //Ztráta dat
-            message = QString("!!!Ztráta dat %1!!!");
-            break;
-
-        case UNCOMPLETE_DATA: //Neúplný datový řádek
-            message = QString("!!!Neúplný datový řetězec %1!!!");
-            break;
-
         case COM_INTERRUPTION: //Přerušení komunikace
             message = "Přerušení spojení";
             break;
@@ -472,6 +439,10 @@ void File::writeLog(errorLogs error)
         case LIMITS_OPEN_ERROR:
             message = "Nepodařilo se otevřít protokol";
             break;
+
+        case HEATER_ERROR:
+            message = "Chyba ovládání topení";
+            break;
         
         default:
             break;
@@ -487,7 +458,7 @@ void File::showLog()
 {
     if(logFile->open(QIODevice::ReadOnly))
     {
-        QMessageBox::information(nullptr, "Průběh testu", QString::fromLatin1(logFile->readAll()), QMessageBox::Ok);
+        QMessageBox::information(nullptr, "Průběh testu", QString::fromUtf8(logFile->readAll()), QMessageBox::Ok);
         logFile->close();
     }
 }
