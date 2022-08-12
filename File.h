@@ -42,7 +42,8 @@ enum errorLogs
     COM_RECONNECTION,
     PROTOCOL_AND_LIMITS_OPEN_ERROR,
     PROTOCOL_OPEN_ERROR,
-    LIMITS_OPEN_ERROR
+    LIMITS_OPEN_ERROR,
+    HEATER_ERROR
 };
 
 class File : public QFile
@@ -82,13 +83,13 @@ public:
     void calibration(unsigned int*);
     void writeLog(errorLogs, int);
     void writeLog(errorLogs);
-    void showLog();
     void removeAll();
     void setSerialNumber(QString serial){serialNumber = serial;};
     void setWorker(QString newWorker){worker = newWorker;};
 
 public slots:
     void saveLimits();
+    void showLog();
 
 signals:
     void calibrationOver();

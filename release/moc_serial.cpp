@@ -1,19 +1,20 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'serial.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.14.2)
+** Created by: The Qt Meta Object Compiler version 68 (Qt 6.3.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
 #include <memory>
 #include "../serial.h"
+#include <QtGui/qtextcursor.h>
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'serial.h' doesn't include <QObject>."
-#elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.14.2. It"
+#elif Q_MOC_OUTPUT_REVISION != 68
+#error "This file was generated using the moc from 6.3.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -22,56 +23,56 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Serial_t {
-    QByteArrayData data[10];
-    char stringdata0[85];
+    const uint offsetsAndSize[24];
+    char stringdata0[108];
 };
-#define QT_MOC_LITERAL(idx, ofs, len) \
-    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_Serial_t, stringdata0) + ofs \
-        - idx * sizeof(QByteArrayData)) \
-    )
+#define QT_MOC_LITERAL(ofs, len) \
+    uint(offsetof(qt_meta_stringdata_Serial_t, stringdata0) + ofs), len 
 static const qt_meta_stringdata_Serial_t qt_meta_stringdata_Serial = {
     {
-QT_MOC_LITERAL(0, 0, 6), // "Serial"
-QT_MOC_LITERAL(1, 7, 13), // "statusChanged"
-QT_MOC_LITERAL(2, 21, 0), // ""
-QT_MOC_LITERAL(3, 22, 7), // "Serial*"
-QT_MOC_LITERAL(4, 30, 14), // "connectionLost"
-QT_MOC_LITERAL(5, 45, 10), // "paketFound"
-QT_MOC_LITERAL(6, 56, 6), // "Paket*"
-QT_MOC_LITERAL(7, 63, 4), // "next"
-QT_MOC_LITERAL(8, 68, 4), // "back"
-QT_MOC_LITERAL(9, 73, 11) // "serialError"
+QT_MOC_LITERAL(0, 6), // "Serial"
+QT_MOC_LITERAL(7, 13), // "statusChanged"
+QT_MOC_LITERAL(21, 0), // ""
+QT_MOC_LITERAL(22, 7), // "Serial*"
+QT_MOC_LITERAL(30, 14), // "connectionLost"
+QT_MOC_LITERAL(45, 10), // "paketFound"
+QT_MOC_LITERAL(56, 6), // "Paket*"
+QT_MOC_LITERAL(63, 4), // "next"
+QT_MOC_LITERAL(68, 4), // "back"
+QT_MOC_LITERAL(73, 11), // "serialError"
+QT_MOC_LITERAL(85, 14), // "setAutoConnect"
+QT_MOC_LITERAL(100, 7) // "enabled"
 
     },
     "Serial\0statusChanged\0\0Serial*\0"
     "connectionLost\0paketFound\0Paket*\0next\0"
-    "back\0serialError"
+    "back\0serialError\0setAutoConnect\0enabled"
 };
 #undef QT_MOC_LITERAL
 
 static const uint qt_meta_data_Serial[] = {
 
  // content:
-       8,       // revision
+      10,       // revision
        0,       // classname
        0,    0, // classinfo
-       6,   14, // methods
+       7,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        3,       // signalCount
 
- // signals: name, argc, parameters, tag, flags
-       1,    1,   44,    2, 0x06 /* Public */,
-       4,    0,   47,    2, 0x06 /* Public */,
-       5,    1,   48,    2, 0x06 /* Public */,
+ // signals: name, argc, parameters, tag, flags, initial metatype offsets
+       1,    1,   56,    2, 0x06,    1 /* Public */,
+       4,    0,   59,    2, 0x06,    3 /* Public */,
+       5,    1,   60,    2, 0x06,    4 /* Public */,
 
- // slots: name, argc, parameters, tag, flags
-       7,    0,   51,    2, 0x0a /* Public */,
-       8,    0,   52,    2, 0x0a /* Public */,
-       9,    0,   53,    2, 0x0a /* Public */,
+ // slots: name, argc, parameters, tag, flags, initial metatype offsets
+       7,    0,   63,    2, 0x0a,    6 /* Public */,
+       8,    0,   64,    2, 0x0a,    7 /* Public */,
+       9,    0,   65,    2, 0x0a,    8 /* Public */,
+      10,    1,   66,    2, 0x0a,    9 /* Public */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3,    2,
@@ -82,6 +83,7 @@ static const uint qt_meta_data_Serial[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Bool,   11,
 
        0        // eod
 };
@@ -90,24 +92,25 @@ void Serial::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         auto *_t = static_cast<Serial *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         switch (_id) {
-        case 0: _t->statusChanged((*reinterpret_cast< Serial*(*)>(_a[1]))); break;
+        case 0: _t->statusChanged((*reinterpret_cast< std::add_pointer_t<Serial*>>(_a[1]))); break;
         case 1: _t->connectionLost(); break;
-        case 2: _t->paketFound((*reinterpret_cast< Paket*(*)>(_a[1]))); break;
+        case 2: _t->paketFound((*reinterpret_cast< std::add_pointer_t<Paket*>>(_a[1]))); break;
         case 3: _t->next(); break;
         case 4: _t->back(); break;
         case 5: _t->serialError(); break;
+        case 6: _t->setAutoConnect((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
         switch (_id) {
-        default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+        default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
         case 0:
             switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+            default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
             case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< Serial* >(); break;
+                *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType::fromType< Serial* >(); break;
             }
             break;
         }
@@ -137,12 +140,18 @@ void Serial::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject Serial::staticMetaObject = { {
+const QMetaObject Serial::staticMetaObject = { {
     QMetaObject::SuperData::link<QSerialPort::staticMetaObject>(),
-    qt_meta_stringdata_Serial.data,
+    qt_meta_stringdata_Serial.offsetsAndSize,
     qt_meta_data_Serial,
     qt_static_metacall,
     nullptr,
+qt_incomplete_metaTypeArray<qt_meta_stringdata_Serial_t
+, QtPrivate::TypeAndForceComplete<Serial, std::true_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<Serial *, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<Paket *, std::false_type>
+, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<bool, std::false_type>
+
+
+>,
     nullptr
 } };
 
@@ -166,13 +175,13 @@ int Serial::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 6)
+        if (_id < 7)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 6;
+        _id -= 7;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 6)
+        if (_id < 7)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 6;
+        _id -= 7;
     }
     return _id;
 }
@@ -197,20 +206,17 @@ void Serial::paketFound(Paket * _t1)
     QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 struct qt_meta_stringdata_portLabel_t {
-    QByteArrayData data[4];
+    const uint offsetsAndSize[8];
     char stringdata0[28];
 };
-#define QT_MOC_LITERAL(idx, ofs, len) \
-    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_portLabel_t, stringdata0) + ofs \
-        - idx * sizeof(QByteArrayData)) \
-    )
+#define QT_MOC_LITERAL(ofs, len) \
+    uint(offsetof(qt_meta_stringdata_portLabel_t, stringdata0) + ofs), len 
 static const qt_meta_stringdata_portLabel_t qt_meta_stringdata_portLabel = {
     {
-QT_MOC_LITERAL(0, 0, 9), // "portLabel"
-QT_MOC_LITERAL(1, 10, 8), // "setState"
-QT_MOC_LITERAL(2, 19, 0), // ""
-QT_MOC_LITERAL(3, 20, 7) // "Serial*"
+QT_MOC_LITERAL(0, 9), // "portLabel"
+QT_MOC_LITERAL(10, 8), // "setState"
+QT_MOC_LITERAL(19, 0), // ""
+QT_MOC_LITERAL(20, 7) // "Serial*"
 
     },
     "portLabel\0setState\0\0Serial*"
@@ -220,7 +226,7 @@ QT_MOC_LITERAL(3, 20, 7) // "Serial*"
 static const uint qt_meta_data_portLabel[] = {
 
  // content:
-       8,       // revision
+      10,       // revision
        0,       // classname
        0,    0, // classinfo
        1,   14, // methods
@@ -230,8 +236,8 @@ static const uint qt_meta_data_portLabel[] = {
        0,       // flags
        0,       // signalCount
 
- // slots: name, argc, parameters, tag, flags
-       1,    1,   19,    2, 0x0a /* Public */,
+ // slots: name, argc, parameters, tag, flags, initial metatype offsets
+       1,    1,   20,    2, 0x0a,    1 /* Public */,
 
  // slots: parameters
     QMetaType::Void, 0x80000000 | 3,    2,
@@ -243,31 +249,37 @@ void portLabel::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         auto *_t = static_cast<portLabel *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         switch (_id) {
-        case 0: _t->setState((*reinterpret_cast< Serial*(*)>(_a[1]))); break;
+        case 0: _t->setState((*reinterpret_cast< std::add_pointer_t<Serial*>>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
         switch (_id) {
-        default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+        default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
         case 0:
             switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+            default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
             case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< Serial* >(); break;
+                *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType::fromType< Serial* >(); break;
             }
             break;
         }
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject portLabel::staticMetaObject = { {
+const QMetaObject portLabel::staticMetaObject = { {
     QMetaObject::SuperData::link<QLabel::staticMetaObject>(),
-    qt_meta_stringdata_portLabel.data,
+    qt_meta_stringdata_portLabel.offsetsAndSize,
     qt_meta_data_portLabel,
     qt_static_metacall,
     nullptr,
+qt_incomplete_metaTypeArray<qt_meta_stringdata_portLabel_t
+, QtPrivate::TypeAndForceComplete<portLabel, std::true_type>
+, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<Serial *, std::false_type>
+
+
+>,
     nullptr
 } };
 

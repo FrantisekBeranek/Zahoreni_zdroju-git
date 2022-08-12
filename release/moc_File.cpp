@@ -1,19 +1,20 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'File.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.14.2)
+** Created by: The Qt Meta Object Compiler version 68 (Qt 6.3.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
 #include <memory>
 #include "../File.h"
+#include <QtGui/qtextcursor.h>
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'File.h' doesn't include <QObject>."
-#elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.14.2. It"
+#elif Q_MOC_OUTPUT_REVISION != 68
+#error "This file was generated using the moc from 6.3.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -22,17 +23,14 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_limits_t {
-    QByteArrayData data[1];
+    const uint offsetsAndSize[2];
     char stringdata0[7];
 };
-#define QT_MOC_LITERAL(idx, ofs, len) \
-    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_limits_t, stringdata0) + ofs \
-        - idx * sizeof(QByteArrayData)) \
-    )
+#define QT_MOC_LITERAL(ofs, len) \
+    uint(offsetof(qt_meta_stringdata_limits_t, stringdata0) + ofs), len 
 static const qt_meta_stringdata_limits_t qt_meta_stringdata_limits = {
     {
-QT_MOC_LITERAL(0, 0, 6) // "limits"
+QT_MOC_LITERAL(0, 6) // "limits"
 
     },
     "limits"
@@ -42,7 +40,7 @@ QT_MOC_LITERAL(0, 0, 6) // "limits"
 static const uint qt_meta_data_limits[] = {
 
  // content:
-       8,       // revision
+      10,       // revision
        0,       // classname
        0,    0, // classinfo
        0,    0, // methods
@@ -57,18 +55,24 @@ static const uint qt_meta_data_limits[] = {
 
 void limits::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
-    Q_UNUSED(_o);
-    Q_UNUSED(_id);
-    Q_UNUSED(_c);
-    Q_UNUSED(_a);
+    (void)_o;
+    (void)_id;
+    (void)_c;
+    (void)_a;
 }
 
-QT_INIT_METAOBJECT const QMetaObject limits::staticMetaObject = { {
+const QMetaObject limits::staticMetaObject = { {
     QMetaObject::SuperData::link<QDialog::staticMetaObject>(),
-    qt_meta_stringdata_limits.data,
+    qt_meta_stringdata_limits.offsetsAndSize,
     qt_meta_data_limits,
     qt_static_metacall,
     nullptr,
+qt_incomplete_metaTypeArray<qt_meta_stringdata_limits_t
+, QtPrivate::TypeAndForceComplete<limits, std::true_type>
+
+
+
+>,
     nullptr
 } };
 
@@ -92,53 +96,53 @@ int limits::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     return _id;
 }
 struct qt_meta_stringdata_File_t {
-    QByteArrayData data[5];
-    char stringdata0[54];
+    const uint offsetsAndSize[12];
+    char stringdata0[62];
 };
-#define QT_MOC_LITERAL(idx, ofs, len) \
-    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_File_t, stringdata0) + ofs \
-        - idx * sizeof(QByteArrayData)) \
-    )
+#define QT_MOC_LITERAL(ofs, len) \
+    uint(offsetof(qt_meta_stringdata_File_t, stringdata0) + ofs), len 
 static const qt_meta_stringdata_File_t qt_meta_stringdata_File = {
     {
-QT_MOC_LITERAL(0, 0, 4), // "File"
-QT_MOC_LITERAL(1, 5, 15), // "calibrationOver"
-QT_MOC_LITERAL(2, 21, 0), // ""
-QT_MOC_LITERAL(3, 22, 20), // "calibrationCancelled"
-QT_MOC_LITERAL(4, 43, 10) // "saveLimits"
+QT_MOC_LITERAL(0, 4), // "File"
+QT_MOC_LITERAL(5, 15), // "calibrationOver"
+QT_MOC_LITERAL(21, 0), // ""
+QT_MOC_LITERAL(22, 20), // "calibrationCancelled"
+QT_MOC_LITERAL(43, 10), // "saveLimits"
+QT_MOC_LITERAL(54, 7) // "showLog"
 
     },
     "File\0calibrationOver\0\0calibrationCancelled\0"
-    "saveLimits"
+    "saveLimits\0showLog"
 };
 #undef QT_MOC_LITERAL
 
 static const uint qt_meta_data_File[] = {
 
  // content:
-       8,       // revision
+      10,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       4,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        2,       // signalCount
 
- // signals: name, argc, parameters, tag, flags
-       1,    0,   29,    2, 0x06 /* Public */,
-       3,    0,   30,    2, 0x06 /* Public */,
+ // signals: name, argc, parameters, tag, flags, initial metatype offsets
+       1,    0,   38,    2, 0x06,    1 /* Public */,
+       3,    0,   39,    2, 0x06,    2 /* Public */,
 
- // slots: name, argc, parameters, tag, flags
-       4,    0,   31,    2, 0x0a /* Public */,
+ // slots: name, argc, parameters, tag, flags, initial metatype offsets
+       4,    0,   40,    2, 0x0a,    3 /* Public */,
+       5,    0,   41,    2, 0x0a,    4 /* Public */,
 
  // signals: parameters
     QMetaType::Void,
     QMetaType::Void,
 
  // slots: parameters
+    QMetaType::Void,
     QMetaType::Void,
 
        0        // eod
@@ -148,11 +152,12 @@ void File::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         auto *_t = static_cast<File *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         switch (_id) {
         case 0: _t->calibrationOver(); break;
         case 1: _t->calibrationCancelled(); break;
         case 2: _t->saveLimits(); break;
+        case 3: _t->showLog(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -172,15 +177,21 @@ void File::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
             }
         }
     }
-    Q_UNUSED(_a);
+    (void)_a;
 }
 
-QT_INIT_METAOBJECT const QMetaObject File::staticMetaObject = { {
+const QMetaObject File::staticMetaObject = { {
     QMetaObject::SuperData::link<QFile::staticMetaObject>(),
-    qt_meta_stringdata_File.data,
+    qt_meta_stringdata_File.offsetsAndSize,
     qt_meta_data_File,
     qt_static_metacall,
     nullptr,
+qt_incomplete_metaTypeArray<qt_meta_stringdata_File_t
+, QtPrivate::TypeAndForceComplete<File, std::true_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>
+, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>
+
+
+>,
     nullptr
 } };
 
@@ -204,13 +215,13 @@ int File::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
+        if (_id < 4)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 4;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 3)
-            *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 3;
+        if (_id < 4)
+            *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
+        _id -= 4;
     }
     return _id;
 }

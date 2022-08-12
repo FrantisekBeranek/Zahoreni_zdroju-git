@@ -6,8 +6,8 @@ TEMPLATE = app
 TARGET = Zahoreni_zdroju
 INCLUDEPATH += .
 QT += widgets
-QT += serialport
 QT += printsupport
+QT += serialport
 
 # You can make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.

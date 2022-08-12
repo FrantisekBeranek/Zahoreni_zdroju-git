@@ -42,12 +42,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->menubar->zahoreni, SIGNAL(startRequest()), this, SLOT(startManage()));
     connect(ui->menubar->zahoreni, SIGNAL(stopRequest()), this, SLOT(stopManage()));
     connect(ui->menubar->zahoreni, SIGNAL(changeLimits()), this, SLOT(limitsManage()));
+    connect(ui->menubar->zahoreni, SIGNAL(showLogRequest()), file, SLOT(showLog()));
     connect(this, SIGNAL(statusChanged(appStatus)), ui->menubar, SLOT(setState(appStatus)));
     connect(port, SIGNAL(statusChanged(Serial*)), this, SLOT(portStatusChanged(Serial*)));
-    ui->menubar->zahoreni->actionZastavit->setEnabled(false);
     ui->menubar->tools->menuCOM->disconnectAction->setEnabled(false);
     ui->menubar->tools->actionKalibrace->setEnabled(false);
     ui->menubar->zahoreni->actionSpustit->setEnabled(false);
+    ui->menubar->zahoreni->actionZastavit->setEnabled(false);
+    ui->menubar->zahoreni->showLog->setEnabled(false);
 
     connect(port, SIGNAL(readyRead()), this, SLOT(read()));
     connect(port, SIGNAL(statusChanged(Serial*)), ui->COMconnected, SLOT(setState(Serial*)));
@@ -127,6 +129,7 @@ void MainWindow::endMeasure(bool continueInMeasure)
     //___Výchozí nastavení proměnných___//
     errorCount = 0;
     warningCount = 0;
+    ui->menubar->zahoreni->showLog->setEnabled(false);
 
     lastNum = 0;
     commandNum = 0;
@@ -305,6 +308,17 @@ void MainWindow::managePaket(Paket* paket)
         /* code */
         break;
 
+    case HEATER_PAKET:
+        if(*paket->data == 0)   //chyba ovládání topení
+        {
+            errorCount++;
+            ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": ").append(QString::number(errorCount)));
+            ui->menubar->zahoreni->showLog->setEnabled(true);
+            file->writeLog(HEATER_ERROR);
+            file->testResult = false;
+        }
+        break;
+
     case CANCEL_FROM_USER_PAKET:
         if(status.measureInProgress)
             endMeasure(false);
@@ -367,6 +381,7 @@ void MainWindow::testNumManage(char num)
         if(status.measureInProgress)
         {
             errorCount++;
+            ui->menubar->zahoreni->showLog->setEnabled(true);
             file->writeLog(DATA_LOSS, lastNum);
             ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": ").append(QString::number(errorCount)));
         }
@@ -453,6 +468,7 @@ void MainWindow::dataManage(char* data, char dataLength)
             if(!(file->writeToFile(result, commandLetter, commandNum)))
             {
                 errorCount++;
+                ui->menubar->zahoreni->showLog->setEnabled(true);
             }
             for (unsigned int i = 0; i < MEAS_TYPES_COUNT; i++)
             {
@@ -496,6 +512,7 @@ void MainWindow::dataBatManage(char* data, char dataLength)
         if(!(file->writeToFile(result, commandLetter, commandNum)))
         {
             errorCount++;
+            ui->menubar->zahoreni->showLog->setEnabled(true);
         }
         for (unsigned int i = 0; i < MEAS_TYPES_COUNT; i++)
         {

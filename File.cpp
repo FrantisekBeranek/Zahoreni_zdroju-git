@@ -247,9 +247,9 @@ int File::makeProtocol()
         //___Nastavení formátu pdf___//
         QPrinter printer(QPrinter::PrinterResolution);
         printer.setOutputFormat(QPrinter::PdfFormat);
-        printer.setPaperSize(QPrinter::A4);
+        printer.setPageSize(QPageSize::A4);
         printer.setOutputFileName(pathPDF);
-        printer.setOrientation(QPrinter::Landscape);
+        printer.setPageOrientation(QPageLayout::Landscape);
 
         QTextDocument doc;
 
@@ -262,7 +262,7 @@ int File::makeProtocol()
 
         //___Přepsání do pdf___//
         doc.setPlainText(QString::fromLatin1(this->readAll()));
-        doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
+        doc.setPageSize(printer.pageRect(QPrinter::Millimeter).size()); // This is necessary if you want to hide the page number
         doc.print(&printer);
 
         //___Zavření a odstranění pomocného txt souboru___//
@@ -396,31 +396,6 @@ void File::writeLog(errorLogs error, int argument)
             message = QString("!!!Neúplný datový řetězec %1!!!").arg(argument);
             break;
 
-        case COM_INTERRUPTION: //Přerušení komunikace
-            message = "Přerušení spojení";
-            break;
-
-        case COM_RECONNECTION: //Obnovení komunikace
-            message = "Obnovení spojení";
-            break;
-
-        //---Chyby writeToFile---//
-        //2 -> chyba protokolu
-        //1 -> chyba limitsfile
-        //0 -> chyba všeho
-
-        case PROTOCOL_AND_LIMITS_OPEN_ERROR:
-            message = "Nepodařilo se otevřít protokol a mezní hodnoty";
-            break;
-
-        case PROTOCOL_OPEN_ERROR:
-            message = "Nepodařilo se otevřít mezní hodnoty";
-            break;
-
-        case LIMITS_OPEN_ERROR:
-            message = "Nepodařilo se otevřít protokol";
-            break;
-        
         default:
             break;
         }
@@ -445,14 +420,6 @@ void File::writeLog(errorLogs error)
         QString message;
         switch (error)
         {
-        case DATA_LOSS: //Ztráta dat
-            message = QString("!!!Ztráta dat %1!!!");
-            break;
-
-        case UNCOMPLETE_DATA: //Neúplný datový řádek
-            message = QString("!!!Neúplný datový řetězec %1!!!");
-            break;
-
         case COM_INTERRUPTION: //Přerušení komunikace
             message = "Přerušení spojení";
             break;
@@ -477,6 +444,10 @@ void File::writeLog(errorLogs error)
         case LIMITS_OPEN_ERROR:
             message = "Nepodařilo se otevřít protokol";
             break;
+
+        case HEATER_ERROR:
+            message = "Chyba ovládání topení";
+            break;
         
         default:
             break;
@@ -492,7 +463,7 @@ void File::showLog()
 {
     if(logFile->open(QIODevice::ReadOnly))
     {
-        QMessageBox::information(nullptr, "Průběh testu", QString::fromLatin1(logFile->readAll()), QMessageBox::Ok);
+        QMessageBox::information(nullptr, "Průběh testu", QString::fromUtf8(logFile->readAll()), QMessageBox::Ok);
         logFile->close();
     }
 }
