@@ -8,43 +8,43 @@
         0.0097196261682243,
         0.009792843691148776
     ],
-    "defaultPath": "D:/frant/Plocha/",
+    "defaultPath": "D:/frant/Documents/TSE/projekty/zahoreni/Aplikace/protokoly/",
     "limits": {
         "12Volts": {
-            "max": 11.5,
-            "maxOpen": 11.5,
+            "max": 12.5,
+            "maxOpen": 12.499999999999996,
             "min": 10.5,
-            "minOpen": 10.5
+            "minOpen": 11.5
         },
         "15Volts": {
-            "max": 14.5,
-            "maxOpen": 14.5,
+            "max": 15.5,
+            "maxOpen": 15.5,
             "min": 13.5,
             "minOpen": 13.5
         },
         "24Volts": {
-            "max": 15,
-            "maxOpen": 15,
+            "max": 25.5,
+            "maxOpen": 25.5,
             "min": 15,
             "minOpen": 15
         },
         "24VoltsOxy": {
-            "max": 15,
-            "maxOpen": 15,
+            "max": 25.5,
+            "maxOpen": 25.5,
             "min": 15,
             "minOpen": 15
         },
         "5VoltKon": {
-            "max": 4.5,
-            "maxOpen": 4.5,
-            "min": 3.5,
-            "minOpen": 3.5
+            "max": 5.5,
+            "maxOpen": 5.5,
+            "min": 4.499999999999998,
+            "minOpen": 4.5
         },
         "5Volts": {
-            "max": 4.5,
-            "maxOpen": 4.5,
-            "min": 3.5,
-            "minOpen": 3.5
+            "max": 5.4999999999999964,
+            "maxOpen": 5.5,
+            "min": 4.499999999999998,
+            "minOpen": 4.5
         },
         "battery": {
             "max": 8.8,

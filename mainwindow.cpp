@@ -101,7 +101,8 @@ void MainWindow::endMeasure(bool continueInMeasure)
 {
     ui->statusbar->showMessage("Ukončení");
 
-    if(!file->makeProtocol()){
+    file->makeProtocol();
+    /*if(!file->makeProtocol()){
         //___Chyba zápisu do protokolu___//
         QMessageBox::warning(this, "Ukončení testu", QString("Nedošlo k řádnému ukončení testu."),
         QMessageBox::Ok);
@@ -123,7 +124,7 @@ void MainWindow::endMeasure(bool continueInMeasure)
             QString("Protokol vygenerován"),
                 QMessageBox::Ok);
         }   
-    }
+    }*/
     db->writeResult(file->testResult);
 
     //___Výchozí nastavení proměnných___//
@@ -147,7 +148,15 @@ void MainWindow::endMeasure(bool continueInMeasure)
     {
         testProperties* properties = suppliesToTest.dequeue();
         supplyInTesting = properties->retPointer();
-        
+        file->pathPDF = properties->retPath();
+        file->setSerialNumber(properties->retSerialNumber());
+        file->setWorker(properties->retWorker());
+
+        ui->statusbar->showMessage(QString::number(supplyInTesting));
+
+        QString path = file->pathPDF.section('.', 0, 0);
+        path = path.append(".txt");
+
         ui->testPhase->setText("Fáze testu: Test spuštěn");
         ui->actualResult->setText("Průběžný výsledek: Ano");
         ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": 0"));
@@ -199,18 +208,14 @@ void MainWindow::startManage()
         delete properties;
         return;
     }
-    file->pathPDF = properties->retPath();
-    file->setSerialNumber(properties->retSerialNumber());
-    file->setWorker(properties->retWorker());
-    supplyInTesting = properties->retPointer();
 
-    ui->statusbar->showMessage(QString::number(supplyInTesting));
+    QString pathPDF_tmp = properties->retPath();
+    QString path_tmp = pathPDF_tmp.section('.', 0, 0);
+    path_tmp = path_tmp.append(".txt");
 
-    QString path = file->pathPDF.section('.', 0, 0);
-    path = path.append(".txt");
     //---Vytvoř a otevři soubor (režim ReadWrite)---//
-    if(!path.isEmpty()){
-        if(file->createFile(path)){ 
+    if(!path_tmp.isEmpty()){
+        if(file->createFile(path_tmp)){ 
             db->writeNewSupply(properties->retSerialNumber(), properties->retWorker(), (QDateTime::currentDateTime()).toString("yyyy-mm-dd hh:mm:ss:sss"));
             //---odešli příkaz k zahájení testu---//
             if(QMessageBox::information(this, "Zahoření zdrojů",
@@ -218,6 +223,13 @@ void MainWindow::startManage()
             QMessageBox::Ok) == QMessageBox::Ok){
                 if(!status.measureInProgress)
                 {
+                    file->pathPDF = pathPDF_tmp;
+                    file->setSerialNumber(properties->retSerialNumber());
+                    file->setWorker(properties->retWorker());
+                    supplyInTesting = properties->retPointer();
+
+                    ui->statusbar->showMessage(QString::number(supplyInTesting));
+
                     ui->testPhase->setText("Fáze testu: Test spuštěn");
                     ui->actualResult->setText("Průběžný výsledek: Ano");
                     ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": 0"));

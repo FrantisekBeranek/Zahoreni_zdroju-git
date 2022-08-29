@@ -93,7 +93,7 @@ QString testProperties::getWorker()
 int testProperties::getPointer(int supplyCount, std::vector<int> allreadySet)
 {
     //___Výběr zdroje k testu___//
-    supplyCount = 1;
+    //supplyCount = 1;
     if(supplyCount)
     {
         QStringList zdroje;

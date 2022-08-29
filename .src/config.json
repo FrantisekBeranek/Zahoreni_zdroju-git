@@ -1,0 +1,50 @@
+{
+    "defaultPath": "D:/frant/Documents/TSE/projekty/zahoreni/Aplikace/protokoly/",
+    "limits": {
+        "12Volts": {
+            "max": 12.5,
+            "maxOpen": 12.5,
+            "min": 11.5,
+            "minOpen": 11.5
+        },
+        "15Volts": {
+            "max": 15.5,
+            "maxOpen": 15.5,
+            "min": 14.5,
+            "minOpen": 14.5
+        },
+        "24Volts": {
+            "max": 24.5,
+            "maxOpen": 24.5,
+            "min": 23.5,
+            "minOpen": 23.5
+        },
+        "24VoltsOxy": {
+            "max": 24.5,
+            "maxOpen": 24.5,
+            "min": 23.5,
+            "minOpen": 23.5
+        },
+        "5VoltKon": {
+            "max": 5.5,
+            "maxOpen": 5.5,
+            "min": 4.5,
+            "minOpen": 4.5
+        },
+        "5Volts": {
+            "max": 5.5,
+            "maxOpen": 5.5,
+            "min": 4.5,
+            "minOpen": 4.5
+        },
+        "battery": {
+            "max": 9,
+            "maxOpen": 9,
+            "min": 8,
+            "minOpen": 8
+        }
+    },
+    "workers": [
+        "Beránek"
+    ]
+}

@@ -113,7 +113,7 @@ int Database::writeNewSupply(QString serialNumber, QString worker, QString date)
                 "'%s', "\
                 "'%s', "\
                 "'%s');",
-                serialNumber.toLocal8Bit().data(), worker.toLocal8Bit().data(), date.toLocal8Bit().data());
+                serialNumber.toUtf8().data(), worker.toUtf8().data(), date.toUtf8().data());
     
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 

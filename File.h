@@ -51,7 +51,7 @@ class File : public QFile
     Q_OBJECT
 
     QString patternPath = "mustr.txt";
-    QString path;
+    //QString path;
     QDir dir;
 
     QString serialNumber;
@@ -108,7 +108,6 @@ signals:
 class JSON_handler
 {
 
-    QString path;
     QFile confFile;
 
 public:

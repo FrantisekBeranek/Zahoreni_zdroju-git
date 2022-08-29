@@ -5,12 +5,12 @@
 File::File()
 {
     //---Nastavení cesty k souboru meze podle domovského adresáře---//
-    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0, -2).append("/.src/");
+    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0, -1).append("/.src/");
     JSON_handler confFile;
     if(!confFile.fileCheck())
     {
         QMessageBox::critical(nullptr, "Chyba souborového systému!",
-            "Důležité soubory neexistují, nebo byly přesunuty", QMessageBox::Ok);
+            QString("Důležité soubory neexistují, nebo byly přesunuty: %1").arg(srcDirPath), QMessageBox::Ok);
             //Pokud se soubory nenajdou, zobrazit confused Travoltu
         // Load animated GIF
         QMovie* movie = new QMovie(QString("200.gif").prepend(srcDirPath));
@@ -47,10 +47,9 @@ int File::createFile(QString path)
     //-----------------TXT-------------------//
     //___Nastavení adresy___//
     this->setFileName(path);
-    this->path = path;
 
     //___Překopírování hlavičky ze vzoru___//
-    if(!(QFile::copy(this->patternPath, path))){
+    if(!(QFile::copy(this->patternPath, this->fileName()))){
         QMessageBox::warning(nullptr, tr("Zahořování zdrojů"), tr("Nepodařilo se otevřít soubor %1").arg(path), QMessageBox::Cancel);
         return 0;
     }
@@ -83,7 +82,7 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
 {
     static bool bat = false;
     unsigned int retVal = 0;
-    this->setFileName(path);
+    this->setFileName(this->fileName());
     QTextStream out2(this);
 
     QString divLine = "+---------+---------+---------+---------+---------+---------+---------+---------+\n";
@@ -147,6 +146,11 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
         out2 << '|' << testName << '|';
 
         for(int i = 0; i < MEAS_TYPES_COUNT; i++){
+
+            if(bat)
+            {
+                i = 4;
+            }
 
             double max, min;
             QString numString;
@@ -225,7 +229,7 @@ int File::makeProtocol()
     QTextStream out(this);
 
     QString divLine = "+---------+---------+\n";
-    this->setFileName(path);
+    this->setFileName(this->fileName());
     if(this->isOpen())
         this->close();
 
@@ -249,19 +253,19 @@ int File::makeProtocol()
         printer.setOutputFormat(QPrinter::PdfFormat);
         printer.setPageSize(QPageSize::A4);
         printer.setOutputFileName(pathPDF);
-        printer.setPageOrientation(QPageLayout::Landscape);
+        //printer.setPageOrientation(QPageLayout::Landscape);
 
         QTextDocument doc;
 
         this->seek(0);  //Nastaví kurzor v txt na začátek
 
         //___Nastavení fontu pdf___//
-        QFont font("Courier", 1);
+        QFont font("Courier", -1);
         font.setFixedPitch(true);
         doc.setDefaultFont(font);
 
         //___Přepsání do pdf___//
-        doc.setPlainText(QString::fromLatin1(this->readAll()));
+        doc.setPlainText(QString::fromUtf8(this->readAll()));
         doc.setPageSize(printer.pageRect(QPrinter::Millimeter).size()); // This is necessary if you want to hide the page number
         doc.print(&printer);
 
@@ -479,18 +483,16 @@ void File::removeAll()
 JSON_handler::JSON_handler()
 {
     QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0, -2).append("/.src/config.json");
-    path = srcDirPath;
     confFile.setFileName(srcDirPath);
 }
 
 void JSON_handler::setFileName(QString fileName)
 {
-    this->path = fileName;
+    confFile.setFileName(fileName);
 }
 
 bool JSON_handler::fileCheck()
 {
-    confFile.setFileName(path);
     return confFile.exists();
 }
 
