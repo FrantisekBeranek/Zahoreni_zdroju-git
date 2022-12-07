@@ -5,7 +5,9 @@
 File::File()
 {
     //---Nastavení cesty k souboru meze podle domovského adresáře---//
-    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0, -1).append("/.src/");
+    QDir srcDirectory = QDir(QCoreApplication::applicationDirPath());
+    srcDirectory.cd(".src");
+    QString srcDirPath = srcDirectory.path();
     JSON_handler confFile;
     if(!confFile.fileCheck())
     {
@@ -24,11 +26,6 @@ File::File()
             movie->start();
             label->show();
         }
-    }  
-    else
-    {
-        //___Úprava zbylých cest___//
-        patternPath.prepend(srcDirPath);
     }
 
     logFile = new QFile;
@@ -37,28 +34,42 @@ File::File()
 //_____Destruktor_____//
 File::~File()
 {
-    if(this->isOpen())
-        this->close();
+
 }
 
 //_____Vytvoření souboru_____//
 int File::createFile(QString path)
 {
-    //-----------------TXT-------------------//
-    //___Nastavení adresy___//
-    this->setFileName(path);
-
-    //___Překopírování hlavičky ze vzoru___//
-    if(!(QFile::copy(this->patternPath, this->fileName()))){
-        QMessageBox::warning(nullptr, tr("Zahořování zdrojů"), tr("Nepodařilo se otevřít soubor %1").arg(path), QMessageBox::Cancel);
-        return 0;
-    }
-
     //----------------PDF--------------------//
 
     doc = new QTextDocument;
     cursor = new QTextCursor(doc);
     cursor->movePosition(QTextCursor::Start);
+
+    printer = new QPrinter(QPrinter::HighResolution); //create your QPrinter (don't need to be high resolution, anyway)
+    printer->setPageSize(QPageSize::A4);
+    printer->setPageOrientation(QPageLayout::Portrait);
+    printer->setPageMargins(QMarginsF(15,15,15,15),QPageLayout::Millimeter);
+    printer->setFullPage(false);
+    printer->setOutputFileName(path);
+    printer->setOutputFormat(QPrinter::PdfFormat); //you can use native format of system usin QPrinter::NativeFormat
+
+    //___Nastavení fontu pdf___//
+    QFont font("Courier", 2);
+    font.setFixedPitch(true);
+    doc->setDefaultFont(font);
+    doc->setPageSize(printer->pageRect(QPrinter::Millimeter).size()); // This is necessary if you want to hide the page number
+
+    //___Přepsání do pdf___//
+    protocolText = 
+    "+------------------------------------------------------------------------------+\n"
+    "|                    Zahoření zdroje - Protokol o zkoušce                      |\n"
+    "+------------------------------------------------------------------------------+\n"
+    "================================================================================\n"
+    "  Dle zkušebního a nastavovacího předpisu 1F395028G pro zdroj SI-610-1, RW-610  \n\n";
+
+    doc->setPlainText(protocolText);
+    doc->print(printer);
     
     return 1;
 }
@@ -67,7 +78,8 @@ int File::createFile(QString path)
 bool File::makeValues(unsigned int* valuesADC, float* valuesFloat)
 {
     JSON_handler confFile;
-    if(!confFile.getConstants(this->transfer)) //Načtení převodních konstant
+    double transfer[MEAS_TYPES_COUNT];
+    if(!confFile.getConstants(transfer)) //Načtení převodních konstant
         return false;
     for (int i = 0; i < MEAS_TYPES_COUNT; i++)
     {
@@ -78,23 +90,18 @@ bool File::makeValues(unsigned int* valuesADC, float* valuesFloat)
 }
 
 //_____Zápis dat do souboru_____//
-bool File::writeToFile(float* values, unsigned char testType, unsigned char testNum)
+bool File::writeToFile(QString path, float* values, unsigned char testType, unsigned char testNum)
 {
     static bool bat = false;
     unsigned int retVal = 0;
-    this->setFileName(this->fileName());
-    QTextStream out2(this);
 
     QString divLine = "+---------+---------+---------+---------+---------+---------+---------+---------+\n";
-
-    if(this->isOpen())
-        this->close();
 
     std::vector<double> limits_open, limits_short;
 
     JSON_handler confFile;
 
-    retVal = this->open(QIODevice::WriteOnly | QIODevice::Append) | (confFile.getLimits(&limits_open, &limits_short) << 1);
+    retVal = 1 | confFile.getLimits(&limits_open, &limits_short) << 1;
         //3 -> vše v pořádku
         //2 -> chyba protokolu
         //1 -> chyba limitsfile
@@ -105,9 +112,10 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
 
         if(testNum == 0)
         {
-            out2 << "Seriove cislo zdroje: " << serialNumber << "\n\n";
-            out2 << divLine;
-            out2 << "|         | 5V_KON  | 5V      | 12V     | 15V     | U_bat   | 24V     | 24V_O2  |\n";
+            createFile(path);
+            protocolText += QString("Seriove cislo zdroje: %1\n\n").arg(serialNumber);
+            protocolText += divLine;
+            protocolText += "|         | 5V_KON  | 5V      | 12V     | 15V     | U_bat   | 24V     | 24V_O2  |\n";
         }
 
         if(testNum < START_MEAS_COUNT) //Start testu
@@ -120,7 +128,7 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
         {
             if(testNum == START_MEAS_COUNT)   //První měření hlavního testu
             {
-                out2 << divLine;
+                protocolText += divLine;
             }
             testName = QString("Mereni %1").arg(testNum-START_MEAS_COUNT+1).leftJustified(9, ' ');
             bat = false;
@@ -130,7 +138,7 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
         {
             if(testNum <= (START_MEAS_COUNT + MAIN_MEAS_COUNT + BAT_START_MEAS_COUNT))
             {
-                out2 << divLine << '\n' << "Baterie\n";
+                protocolText += divLine + '\n' + "Baterie\n";
             }
             
             testName = QString("Mereni %1").arg(testNum-(START_MEAS_COUNT + MAIN_MEAS_COUNT + BAT_START_MEAS_COUNT)+1).leftJustified(9, ' ');
@@ -142,8 +150,7 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
             divLine = "+---------+---------+\n";
         }
 
-        out2 << divLine;
-        out2 << '|' << testName << '|';
+        protocolText += divLine + '|' + testName + '|';
 
         for(int i = 0; i < MEAS_TYPES_COUNT; i++){
 
@@ -182,24 +189,24 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
                 //---Zkrať na sedm a přidej ".."---//
                 numString.resize(7);
                 numString.append("..|");
-                out2 << numString;
+                protocolText += numString;
             }
             else
             {
-                        
-                out2 << numString;
+                protocolText += numString;
                 for (int x = 0; x < 9 - numString.length(); x++)
                 {
-                    out2 << ' ';
+                    protocolText += ' ';
                 }
-                out2 << '|';
+                protocolText += '|';
             }
             if(bat)
                 break;
         }
-        out2 << "\n";
+        protocolText += '\n';
 
-        this->close();
+        doc->setPlainText(protocolText);
+        doc->print(printer);
         return true;
     }
     else{
@@ -217,7 +224,7 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
                 err = LIMITS_OPEN_ERROR;
                 break;
         }
-        writeLog(err);
+        writeLog(path, err);
 
         return false;
     }
@@ -226,59 +233,22 @@ bool File::writeToFile(float* values, unsigned char testType, unsigned char test
 //_____Dopíše závěr protokolu a přepíše ho do pdf_____//
 int File::makeProtocol()
 {
-    QTextStream out(this);
-
     QString divLine = "+---------+---------+\n";
-    this->setFileName(this->fileName());
-    if(this->isOpen())
-        this->close();
-
-    if(this->open(QIODevice::WriteOnly | QIODevice::Append)){   
-        //___Zapiš výsledek testu___//
-        out << divLine  << "\n\n" << "Vysledek: ";
-        if(testResult)
-            out << "+";
-        else
-            out << "-";
-        
-        //___Zapiš pracovníka a datum___//
-        out << "\nProvedl: " << worker << "    dne: " << QDateTime::currentDateTime().toString("dd.MM.yyyy");
-
-        this->close();
-
-        this->open(QIODevice::ReadOnly);
-
-        //___Nastavení formátu pdf___//
-        QPrinter printer(QPrinter::PrinterResolution);
-        printer.setOutputFormat(QPrinter::PdfFormat);
-        printer.setPageSize(QPageSize::A4);
-        printer.setOutputFileName(pathPDF);
-        //printer.setPageOrientation(QPageLayout::Landscape);
-
-        QTextDocument doc;
-
-        this->seek(0);  //Nastaví kurzor v txt na začátek
-
-        //___Nastavení fontu pdf___//
-        QFont font("Courier", -1);
-        font.setFixedPitch(true);
-        doc.setDefaultFont(font);
-
-        //___Přepsání do pdf___//
-        doc.setPlainText(QString::fromUtf8(this->readAll()));
-        doc.setPageSize(printer.pageRect(QPrinter::Millimeter).size()); // This is necessary if you want to hide the page number
-        doc.print(&printer);
-
-        //___Zavření a odstranění pomocného txt souboru___//
-        this->close();
-        this->remove();
-
-        return 1;
-    }
+ 
+    //___Zapiš výsledek testu___//
+    protocolText += divLine + "\n\n" + "Výsledek: ";
+    if(testResult)
+        protocolText += "+";
     else
-    {
-        return 0;  
-    }
+        protocolText += "-";
+    
+    //___Zapiš pracovníka a datum___//
+    protocolText += "\nProvedl: " + worker + "    dne: " + QDateTime::currentDateTime().toString("dd.MM.yyyy");
+
+    doc->setPlainText(protocolText);
+    doc->print(printer);
+
+    return 1;
 }
 
 //====Práce s mezemi====//
@@ -371,10 +341,9 @@ void File::calibration(unsigned int* values)
 
 //====Logování chyb====//
 
-void File::writeLog(errorLogs error, int argument)
+void File::writeLog(QString path, errorLogs error, int argument)
 {
-
-    QString logFilePath = this->fileName().section('.', 0, 0);
+    QString logFilePath = path.section('.', 0, 0);
     logFilePath.append("_log.txt");
     logFile->setFileName(logFilePath);
 
@@ -404,9 +373,9 @@ void File::writeLog(errorLogs error, int argument)
     }
 }
 
-void File::writeLog(errorLogs error)
+void File::writeLog(QString path, errorLogs error)
 {
-    QString logFilePath = this->fileName().section('.', 0, 0);
+    QString logFilePath = path.section('.', 0, 0);
     logFilePath.append("_log.txt");
     logFile->setFileName(logFilePath);
 
@@ -445,7 +414,11 @@ void File::writeLog(errorLogs error)
             break;
 
         case HEATER_ERROR:
-            message = "Chyba ovládání topení";
+            message = "Chyba spuštění topení";
+            break;
+
+        case HEATER_TRIAC_ERROR:
+            message = "Chyba vypínání topení";
             break;
         
         default:
@@ -471,7 +444,6 @@ void File::showLog()
 
 void File::removeAll()
 {
-    this->remove();
     if(logFile->exists())
     {
         logFile->remove();
@@ -482,8 +454,10 @@ void File::removeAll()
 //===Práce s JSON souborem pro configuraci===//
 JSON_handler::JSON_handler()
 {
-    QString srcDirPath = QCoreApplication::applicationDirPath().section('/', 0, -2).append("/.src/config.json");
-    confFile.setFileName(srcDirPath);
+    QDir srcDirectory = QDir(QCoreApplication::applicationDirPath());
+    srcDirectory.cd(".src");
+    QString confFilePath = srcDirectory.absoluteFilePath("config.json");
+    confFile.setFileName(confFilePath);
 }
 
 void JSON_handler::setFileName(QString fileName)

@@ -181,7 +181,7 @@ void File::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
 }
 
 const QMetaObject File::staticMetaObject = { {
-    QMetaObject::SuperData::link<QFile::staticMetaObject>(),
+    QMetaObject::SuperData::link<QObject::staticMetaObject>(),
     qt_meta_stringdata_File.offsetsAndSize,
     qt_meta_data_File,
     qt_static_metacall,
@@ -206,12 +206,12 @@ void *File::qt_metacast(const char *_clname)
     if (!_clname) return nullptr;
     if (!strcmp(_clname, qt_meta_stringdata_File.stringdata0))
         return static_cast<void*>(this);
-    return QFile::qt_metacast(_clname);
+    return QObject::qt_metacast(_clname);
 }
 
 int File::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QFile::qt_metacall(_c, _id, _a);
+    _id = QObject::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {

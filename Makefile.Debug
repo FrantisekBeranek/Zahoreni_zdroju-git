@@ -306,12 +306,7 @@ debug/moc_File.cpp: File.h \
 		D:/Qt/6.3.1/mingw_64/include/QtWidgets/QMessageBox \
 		D:/Qt/6.3.1/mingw_64/include/QtWidgets/qmessagebox.h \
 		D:/Qt/6.3.1/mingw_64/include/QtCore/QString \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QTextStream \
 		D:/Qt/6.3.1/mingw_64/include/QtCore/QDateTime \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QDir \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QTimer \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/qtimer.h \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/qbasictimer.h \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/QPrinter \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qprinter.h \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qtprintsupportglobal.h \
@@ -324,13 +319,6 @@ debug/moc_File.cpp: File.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextDocument \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextdocument.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextCursor \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextTable \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtexttable.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextobject.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextlayout.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qglyphrun.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qrawfont.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qfontdatabase.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QMovie \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qmovie.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qimagereader.h \
@@ -571,7 +559,6 @@ debug/moc_mainwindow.cpp: mainwindow.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextoption.h \
 		D:/Qt/6.3.1/mingw_64/include/QtWidgets/QDialog \
 		D:/Qt/6.3.1/mingw_64/include/QtCore/QDateTime \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QDir \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/QPrinter \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qprinter.h \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qtprintsupportglobal.h \
@@ -583,13 +570,6 @@ debug/moc_mainwindow.cpp: mainwindow.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qpageranges.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextDocument \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextCursor \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextTable \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtexttable.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextobject.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextlayout.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qglyphrun.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qrawfont.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qfontdatabase.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QMovie \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qmovie.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qimagereader.h \
@@ -1146,7 +1126,6 @@ debug/moc_menuBar.cpp: menuBar.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextoption.h \
 		D:/Qt/6.3.1/mingw_64/include/QtWidgets/QDialog \
 		D:/Qt/6.3.1/mingw_64/include/QtCore/QDateTime \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QDir \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/QPrinter \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qprinter.h \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qtprintsupportglobal.h \
@@ -1158,13 +1137,6 @@ debug/moc_menuBar.cpp: menuBar.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qpageranges.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextDocument \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextCursor \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextTable \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtexttable.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextobject.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextlayout.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qglyphrun.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qrawfont.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qfontdatabase.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QMovie \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qmovie.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qimagereader.h \
@@ -1390,12 +1362,7 @@ debug/File.o: File.cpp File.h \
 		D:/Qt/6.3.1/mingw_64/include/QtWidgets/QMessageBox \
 		D:/Qt/6.3.1/mingw_64/include/QtWidgets/qmessagebox.h \
 		D:/Qt/6.3.1/mingw_64/include/QtCore/QString \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QTextStream \
 		D:/Qt/6.3.1/mingw_64/include/QtCore/QDateTime \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QDir \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QTimer \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/qtimer.h \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/qbasictimer.h \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/QPrinter \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qprinter.h \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qtprintsupportglobal.h \
@@ -1408,13 +1375,6 @@ debug/File.o: File.cpp File.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextDocument \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextdocument.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextCursor \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextTable \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtexttable.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextobject.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextlayout.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qglyphrun.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qrawfont.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qfontdatabase.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QMovie \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qmovie.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qimagereader.h \
@@ -1451,6 +1411,8 @@ debug/File.o: File.cpp File.h \
 		D:/Qt/6.3.1/mingw_64/include/QtCore/qjsonarray.h \
 		ui_limits.h \
 		D:/Qt/6.3.1/mingw_64/include/QtCore/QVariant \
+		D:/Qt/6.3.1/mingw_64/include/QtWidgets/QAbstractButton \
+		D:/Qt/6.3.1/mingw_64/include/QtWidgets/qabstractbutton.h \
 		D:/Qt/6.3.1/mingw_64/include/QtWidgets/QApplication \
 		D:/Qt/6.3.1/mingw_64/include/QtWidgets/qapplication.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qguiapplication.h \
@@ -1670,7 +1632,6 @@ debug/main.o: main.cpp mainwindow.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextoption.h \
 		D:/Qt/6.3.1/mingw_64/include/QtWidgets/QDialog \
 		D:/Qt/6.3.1/mingw_64/include/QtCore/QDateTime \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QDir \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/QPrinter \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qprinter.h \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qtprintsupportglobal.h \
@@ -1682,13 +1643,6 @@ debug/main.o: main.cpp mainwindow.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qpageranges.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextDocument \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextCursor \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextTable \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtexttable.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextobject.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextlayout.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qglyphrun.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qrawfont.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qfontdatabase.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QMovie \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qmovie.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qimagereader.h \
@@ -1937,7 +1891,6 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextoption.h \
 		D:/Qt/6.3.1/mingw_64/include/QtWidgets/QDialog \
 		D:/Qt/6.3.1/mingw_64/include/QtCore/QDateTime \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QDir \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/QPrinter \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qprinter.h \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qtprintsupportglobal.h \
@@ -1949,13 +1902,6 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qpageranges.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextDocument \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextCursor \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextTable \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtexttable.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextobject.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextlayout.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qglyphrun.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qrawfont.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qfontdatabase.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QMovie \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qmovie.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qimagereader.h \
@@ -2097,6 +2043,10 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QtGuiDepends \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qabstractfileiconprovider.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qabstracttextdocumentlayout.h \
+		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextlayout.h \
+		D:/Qt/6.3.1/mingw_64/include/QtGui/qglyphrun.h \
+		D:/Qt/6.3.1/mingw_64/include/QtGui/qrawfont.h \
+		D:/Qt/6.3.1/mingw_64/include/QtGui/qfontdatabase.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qaccessible.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qaccessiblebridge.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qaccessibleobject.h \
@@ -2155,9 +2105,11 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qstatictext.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qstylehints.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qsyntaxhighlighter.h \
+		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextobject.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextdocumentfragment.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextdocumentwriter.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextlist.h \
+		D:/Qt/6.3.1/mingw_64/include/QtGui/qtexttable.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qundogroup.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qundostack.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qtguiversion.h \
@@ -2776,7 +2728,6 @@ debug/menuBar.o: menuBar.cpp menuBar.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextoption.h \
 		D:/Qt/6.3.1/mingw_64/include/QtWidgets/QDialog \
 		D:/Qt/6.3.1/mingw_64/include/QtCore/QDateTime \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QDir \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/QPrinter \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qprinter.h \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qtprintsupportglobal.h \
@@ -2788,13 +2739,6 @@ debug/menuBar.o: menuBar.cpp menuBar.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qpageranges.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextDocument \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextCursor \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextTable \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtexttable.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextobject.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextlayout.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qglyphrun.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qrawfont.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qfontdatabase.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QMovie \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qmovie.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qimagereader.h \
@@ -2992,11 +2936,6 @@ debug/testProperties.o: testProperties.cpp testProperties.h \
 		File.h \
 		global_macros.h \
 		D:/Qt/6.3.1/mingw_64/include/QtWidgets/QDialog \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QTextStream \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QDir \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/QTimer \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/qtimer.h \
-		D:/Qt/6.3.1/mingw_64/include/QtCore/qbasictimer.h \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/QPrinter \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qprinter.h \
 		D:/Qt/6.3.1/mingw_64/include/QtPrintSupport/qtprintsupportglobal.h \
@@ -3009,13 +2948,6 @@ debug/testProperties.o: testProperties.cpp testProperties.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextDocument \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextdocument.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextCursor \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/QTextTable \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtexttable.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextobject.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qtextlayout.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qglyphrun.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qrawfont.h \
-		D:/Qt/6.3.1/mingw_64/include/QtGui/qfontdatabase.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/QMovie \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qmovie.h \
 		D:/Qt/6.3.1/mingw_64/include/QtGui/qimagereader.h \

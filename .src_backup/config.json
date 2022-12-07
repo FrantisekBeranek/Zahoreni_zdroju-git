@@ -1,4 +1,13 @@
 {
+    "calibration": [
+        0.0018904320987654323,
+        0.0018943533697632058,
+        0.0046642541214314435,
+        0.006300211416490486,
+        0.003554603854389722,
+        0.0097196261682243,
+        0.009792843691148776
+    ],
     "defaultPath": "D:/frant/Documents/TSE/projekty/zahoreni/Aplikace/protokoly/",
     "limits": {
         "12Volts": {
@@ -15,13 +24,13 @@
         },
         "24Volts": {
             "max": 24.5,
-            "maxOpen": 24.5,
+            "maxOpen": 26.5,
             "min": 23.5,
             "minOpen": 23.5
         },
         "24VoltsOxy": {
             "max": 24.5,
-            "maxOpen": 24.5,
+            "maxOpen": 26.5,
             "min": 23.5,
             "minOpen": 23.5
         },
