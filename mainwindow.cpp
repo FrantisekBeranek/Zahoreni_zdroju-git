@@ -125,7 +125,7 @@ void MainWindow::endMeasure(bool continueInMeasure)
                 QMessageBox::Ok);
         }   
     }*/
-    db->writeResult(file->testResult);
+    db->writeResult(file->getResult());
 
     //___Výchozí nastavení proměnných___//
     errorCount = 0;
@@ -134,6 +134,8 @@ void MainWindow::endMeasure(bool continueInMeasure)
 
     lastNum = 0;
     commandNum = 0;
+
+    delete supplyInTestingProp;
 
     if(!continueInMeasure)
         suppliesToTest.clear();
@@ -146,26 +148,22 @@ void MainWindow::endMeasure(bool continueInMeasure)
     }
     else
     {
-        testProperties* properties = suppliesToTest.dequeue();
-        supplyInTesting = properties->retPointer();
-        file->pathPDF = properties->retPath();
-        file->setSerialNumber(properties->retSerialNumber());
-        file->setWorker(properties->retWorker());
+        supplyInTestingProp = suppliesToTest.dequeue();
+        supplyInTesting = supplyInTestingProp->retPointer();
+        file->setSerialNumber(supplyInTestingProp->retSerialNumber());
+        file->setWorker(supplyInTestingProp->retWorker());
 
         ui->statusbar->showMessage(QString::number(supplyInTesting));
-
-        QString path = file->pathPDF.section('.', 0, 0);
-        path = path.append(".txt");
 
         ui->testPhase->setText("Fáze testu: Test spuštěn");
         ui->actualResult->setText("Průběžný výsledek: Ano");
         ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": 0"));
         ui->resultTable->clearContents();
         
-        port->writePaket(START_PAKET, properties->retPointer());
+        port->writePaket(START_PAKET, supplyInTestingProp->retPointer());
         status.measureInProgress = true;
         emit statusChanged(status);
-        file->testResult = true;
+        file->setResult(true);
         lastNum = 0;
 
         startTimer = new QTimer;
@@ -210,47 +208,43 @@ void MainWindow::startManage()
     }
 
     QString pathPDF_tmp = properties->retPath();
-    QString path_tmp = pathPDF_tmp.section('.', 0, 0);
-    path_tmp = path_tmp.append(".txt");
 
     //---Vytvoř a otevři soubor (režim ReadWrite)---//
-    if(!path_tmp.isEmpty()){
-        if(file->createFile(path_tmp)){ 
-            db->writeNewSupply(properties->retSerialNumber(), properties->retWorker(), (QDateTime::currentDateTime()).toString("yyyy-mm-dd hh:mm:ss:sss"));
-            //---odešli příkaz k zahájení testu---//
-            if(QMessageBox::information(this, "Zahoření zdrojů",
-            "Připojte a spustě testovaný zdroj\nPoté stiskněte OK pro pokračování",
-            QMessageBox::Ok) == QMessageBox::Ok){
-                if(!status.measureInProgress)
-                {
-                    file->pathPDF = pathPDF_tmp;
-                    file->setSerialNumber(properties->retSerialNumber());
-                    file->setWorker(properties->retWorker());
-                    supplyInTesting = properties->retPointer();
+    if(!pathPDF_tmp.isEmpty()){
+        db->writeNewSupply(properties->retSerialNumber(), properties->retWorker(), (QDateTime::currentDateTime()).toString("yyyy-mm-dd hh:mm:ss:sss"));
+        //---odešli příkaz k zahájení testu---//
+        if(QMessageBox::information(this, "Zahoření zdrojů",
+        "Připojte a spustě testovaný zdroj\nPoté stiskněte OK pro pokračování",
+        QMessageBox::Ok) == QMessageBox::Ok){
+            if(!status.measureInProgress)
+            {
+                file->setSerialNumber(properties->retSerialNumber());
+                file->setWorker(properties->retWorker());
+                supplyInTesting = properties->retPointer();
+                supplyInTestingProp = properties;
 
-                    ui->statusbar->showMessage(QString::number(supplyInTesting));
+                ui->statusbar->showMessage(QString::number(supplyInTesting));
 
-                    ui->testPhase->setText("Fáze testu: Test spuštěn");
-                    ui->actualResult->setText("Průběžný výsledek: Ano");
-                    ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": 0"));
-                    ui->resultTable->clearContents();
-                    
-                    port->writePaket(START_PAKET, supplyInTesting);
-                    status.measureInProgress = true;
-                    emit statusChanged(status);
-                    file->testResult = true;
-                    lastNum = 0;
+                ui->testPhase->setText("Fáze testu: Test spuštěn");
+                ui->actualResult->setText("Průběžný výsledek: Ano");
+                ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": 0"));
+                ui->resultTable->clearContents();
+                
+                port->writePaket(START_PAKET, supplyInTesting);
+                status.measureInProgress = true;
+                emit statusChanged(status);
+                file->setResult(true);
+                lastNum = 0;
 
-                    startTimer = new QTimer;
-                    startTimer->setSingleShot(true);
-                    startTimer->setInterval(5000);
-                    connect(startTimer, SIGNAL(timeout()), this, SLOT(startError()));
-                    startTimer->start();
-                }
-                else
-                {
-                    suppliesToTest.enqueue(properties);
-                }
+                startTimer = new QTimer;
+                startTimer->setSingleShot(true);
+                startTimer->setInterval(5000);
+                connect(startTimer, SIGNAL(timeout()), this, SLOT(startError()));
+                startTimer->start();
+            }
+            else
+            {
+                suppliesToTest.enqueue(properties);
             }
         }
     }
@@ -321,13 +315,13 @@ void MainWindow::managePaket(Paket* paket)
         break;
 
     case HEATER_PAKET:
-        if(*paket->data == 0)   //chyba ovládání topení
+        if(*paket->data != 0)   //chyba ovládání topení
         {
             errorCount++;
             ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": ").append(QString::number(errorCount)));
             ui->menubar->zahoreni->showLog->setEnabled(true);
-            file->writeLog(HEATER_ERROR);
-            file->testResult = false;
+            file->writeLog(supplyInTestingProp->retPath(), (*paket->data == 1)? HEATER_ERROR : HEATER_TRIAC_ERROR);
+            file->setResult(false);
         }
         break;
 
@@ -353,7 +347,7 @@ void MainWindow::read(){
         status.COMstate = PORT_OK;
         emit statusChanged(status);
         if(status.measureInProgress)
-            file->writeLog(COM_RECONNECTION);
+            file->writeLog(supplyInTestingProp->retPath(), COM_RECONNECTION);
     }
 
 }
@@ -394,7 +388,7 @@ void MainWindow::testNumManage(char num)
         {
             errorCount++;
             ui->menubar->zahoreni->showLog->setEnabled(true);
-            file->writeLog(DATA_LOSS, lastNum);
+            file->writeLog(supplyInTestingProp->retPath(), DATA_LOSS, lastNum);
             ui->errorCount->setText(ui->errorCount->text().section(':', 0, 0).append(": ").append(QString::number(errorCount)));
         }
         lastNum = commandNum;
@@ -477,7 +471,7 @@ void MainWindow::dataManage(char* data, char dataLength)
             float result[MEAS_TYPES_COUNT];
             file->makeValues(values, result);
             db->writeRow(result, commandLetter, commandNum);
-            if(!(file->writeToFile(result, commandLetter, commandNum)))
+            if(!(file->writeToFile(supplyInTestingProp->retPath(), result, commandLetter, commandNum)))
             {
                 errorCount++;
                 ui->menubar->zahoreni->showLog->setEnabled(true);
@@ -489,7 +483,7 @@ void MainWindow::dataManage(char* data, char dataLength)
                 cell->setFlags(cell->flags() ^ Qt::ItemIsEditable);
                 ui->resultTable->setItem(commandNum, i, cell);
             }
-            if(file->testResult)
+            if(file->getResult())
                 ui->actualResult->setText("Průběžný výsledek: Ano");
             else
                 ui->actualResult->setText("Průběžný výsledek: Ne");
@@ -500,11 +494,11 @@ void MainWindow::dataManage(char* data, char dataLength)
     {
         QMessageBox::warning(this, tr("Zahořování zdrojů"), 
         QString("Některé hodnoty chybí, nebo jsou nulové.\nZkontrolujte připojení zdroje."), QMessageBox::Cancel);
-        file->writeLog(UNCOMPLETE_DATA, commandNum);
+        file->writeLog(supplyInTestingProp->retPath(), UNCOMPLETE_DATA, commandNum);
     }
     else
     {
-        file->writeLog(UNCOMPLETE_DATA, commandNum);
+        file->writeLog(supplyInTestingProp->retPath(), UNCOMPLETE_DATA, commandNum);
         return;
     }
 }
@@ -521,7 +515,7 @@ void MainWindow::dataBatManage(char* data, char dataLength)
 
         float result[MEAS_TYPES_COUNT];
         file->makeValues(values, result);
-        if(!(file->writeToFile(result, commandLetter, commandNum)))
+        if(!(file->writeToFile(supplyInTestingProp->retPath(), result, commandLetter, commandNum)))
         {
             errorCount++;
             ui->menubar->zahoreni->showLog->setEnabled(true);
@@ -537,7 +531,7 @@ void MainWindow::dataBatManage(char* data, char dataLength)
             cell->setFlags(cell->flags() ^ Qt::ItemIsEditable);
             ui->resultTable->setItem(commandNum, i, cell);
         }
-        if(file->testResult)
+        if(file->getResult())
             ui->actualResult->setText("Průběžný výsledek: Ano");
         else
             ui->actualResult->setText("Průběžný výsledek: Ne");
@@ -545,7 +539,7 @@ void MainWindow::dataBatManage(char* data, char dataLength)
     }
     else
     {
-        file->writeLog(UNCOMPLETE_DATA, commandNum);
+        file->writeLog(supplyInTestingProp->retPath(), UNCOMPLETE_DATA, commandNum);
         return;
     }
 }

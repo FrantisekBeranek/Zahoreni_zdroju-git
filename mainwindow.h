@@ -30,6 +30,7 @@ class MainWindow : public QMainWindow
     //___Bool proměnné___//
     appStatus status;
     int supplyInTesting;
+    testProperties* supplyInTestingProp;
     QQueue<testProperties*> suppliesToTest;
 
     //___Popis fáze testu___//

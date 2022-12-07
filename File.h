@@ -8,14 +8,14 @@
 #include <QDialog>
 #include <QMessageBox>
 #include <QString>
-#include <QTextStream>
+//#include <QTextStream>
 #include <QDateTime>
 #include <QDir>
-#include <QTimer>
+//#include <QTimer>
 #include <QPrinter>
 #include <QTextDocument>
 #include <QTextCursor>
-#include <QTextTable>
+//#include <QTextTable>
 #include <QMovie>
 
 QT_BEGIN_NAMESPACE
@@ -43,16 +43,13 @@ enum errorLogs
     PROTOCOL_AND_LIMITS_OPEN_ERROR,
     PROTOCOL_OPEN_ERROR,
     LIMITS_OPEN_ERROR,
-    HEATER_ERROR
+    HEATER_ERROR,
+    HEATER_TRIAC_ERROR
 };
 
-class File : public QFile
+class File : public QObject
 {
     Q_OBJECT
-
-    QString patternPath = "mustr.txt";
-    //QString path;
-    QDir dir;
 
     QString serialNumber;
     QString worker;
@@ -62,30 +59,31 @@ class File : public QFile
 
     QTextDocument*doc;
     QTextCursor* cursor;
+    QPrinter* printer;
 
-    double transfer[7];
+    QString protocolText;
+
+    bool testResult = true;
 
 public:
     File();
     ~File();
 
-    QString pathPDF;
-
-    bool testResult = true;
-
     int createFile(QString);   //vytvoří nový soubor a překopíruje do něj šablonu
     std::vector<QString> makeArray(QString, int);
     bool makeValues(unsigned int*, float*);
-    bool writeToFile(float*, unsigned char, unsigned char);
+    bool writeToFile(QString, float*, unsigned char, unsigned char);
     bool limitsCheck();
     bool limitsSetup();
     int makeProtocol();
     void calibration(unsigned int*);
-    void writeLog(errorLogs, int);
-    void writeLog(errorLogs);
+    void writeLog(QString, errorLogs, int);
+    void writeLog(QString, errorLogs);
     void removeAll();
     void setSerialNumber(QString serial){serialNumber = serial;};
     void setWorker(QString newWorker){worker = newWorker;};
+    void setResult(bool result){testResult = result;};
+    bool getResult(){return testResult;};
 
 public slots:
     void saveLimits();
