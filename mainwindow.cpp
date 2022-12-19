@@ -450,11 +450,11 @@ void MainWindow::dataManage(char* data, char dataLength)
     *    PAD9, PAD15,               //kanál 4, 13
     *    U48V_CURRENT               //kanál 3
     */
-    int swap[MEAS_TYPES_COUNT] = {3, 2, 6, 5, 0, 1, 4};
-    if(dataLength == 2*MEAS_TYPES_COUNT)    // Ošetření délky dat
+    int swap[MEAS_TYPES_COUNT+1] = {3, 2, 6, 5, 0, 1, 4, 7};
+    if(dataLength == 2*(MEAS_TYPES_COUNT+1))    // Ošetření délky dat
     {
-        unsigned int values[MEAS_TYPES_COUNT] = {0};
-        for (int i = 0; i < MEAS_TYPES_COUNT; i++)
+        unsigned int values[MEAS_TYPES_COUNT+1] = {0};
+        for (int i = 0; i < MEAS_TYPES_COUNT+1; i++)
         {
             values[swap[i]] |= ((data[2*i] << 8) & 0xFF00);
             values[swap[i]] |= (data[2*i + 1] & 0xFF);
@@ -506,12 +506,14 @@ void MainWindow::dataManage(char* data, char dataLength)
 //_____Paket dat měření baterie_____//
 void MainWindow::dataBatManage(char* data, char dataLength)
 {
-    if(dataLength == 2) // Ošetření délky dat
+    if(dataLength == 4) // Ošetření délky dat
     {
-        unsigned int values[MEAS_TYPES_COUNT] = {0};
+        unsigned int values[MEAS_TYPES_COUNT+1] = {0};
         //values[4] = (data[0] << 8) + data[1];
         values[4] |= ((data[0] << 8) & 0xFF00);
         values[4] |= (data[1] & 0xFF);
+        values[7] |= ((data[2] << 8) & 0xFF00);
+        values[7] |= (data[3] & 0xFF);
 
         float result[MEAS_TYPES_COUNT];
         file->makeValues(values, result);

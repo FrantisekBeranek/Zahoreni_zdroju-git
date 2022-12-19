@@ -14,6 +14,18 @@ typedef struct
 
 //#define QT_NO_DEBUG_OUTPUT
 
+//___Calibration constant for internal reference of MCU___//
+#define CALIB_CONSTANT 1525
+
+//___Transfer values of each voltage divider___//
+#define U24V_TRANSFER_CONSTANT	    11.933041f
+#define U24VO2_TRANSFER_CONSTANT	12.039604f
+#define U15V_TRANSFER_CONSTANT	    7.7083333f
+#define U12V_TRANSFER_CONSTANT	    5.5880893f
+#define UBAT_TRANSFER_CONSTANT	    4.3404035f
+#define U5V_TRANSFER_CONSTANT	    2.3294642f
+#define U5VK_TRANSFER_CONSTANT	    2.3275047f
+
 //---Počet měřených veličin---//
 #define MEAS_TYPES_COUNT 7
 #define FINAL
