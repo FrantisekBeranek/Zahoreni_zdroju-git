@@ -66,13 +66,34 @@ int File::createFile(QString path)
 //_____Převod z hodnot ADC na napětí_____//
 bool File::makeValues(unsigned int* valuesADC, float* valuesFloat)
 {
-    JSON_handler confFile;
+    //___TODO___//
+    /*JSON_handler confFile;
     if(!confFile.getConstants(this->transfer)) //Načtení převodních konstant
         return false;
     for (int i = 0; i < MEAS_TYPES_COUNT; i++)
     {
         valuesFloat[i] = valuesADC[i] * transfer[i];
-    }
+    }*/
+
+    float transferConsts[] = {
+        U5VK_TRANSFER_CONSTANT,
+        U5V_TRANSFER_CONSTANT,
+        U12V_TRANSFER_CONSTANT,
+        U15V_TRANSFER_CONSTANT,
+        UBAT_TRANSFER_CONSTANT,
+        U24V_TRANSFER_CONSTANT,
+        U24VO2_TRANSFER_CONSTANT
+    };
+
+    int interRef = valuesADC[7];
+    double valTmp = 0;
+	for(uint8_t i = 0; i < 7; i++)
+	{
+		valTmp = valuesADC[i]*3.3*CALIB_CONSTANT;
+		valTmp /= interRef*4095;
+		valTmp *= transferConsts[i];
+        valuesFloat[i] = valTmp;
+	}
     
     return true;
 }

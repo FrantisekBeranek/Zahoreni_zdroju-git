@@ -1,50 +1,60 @@
 {
+    "calibration": [
+        0.0018726591760299626,
+        0.001876770538243626,
+        0.004538401861908456,
+        0.0061334438458350606,
+        0.003484031522189963,
+        0.00889218228973694,
+        0.008820286659316428
+    ],
     "defaultPath": "D:/frant/Documents/TSE/projekty/zahoreni/Aplikace/protokoly/",
     "limits": {
         "12Volts": {
             "max": 12.5,
-            "maxOpen": 12.5,
-            "min": 11.5,
+            "maxOpen": 12.499999999999996,
+            "min": 10.5,
             "minOpen": 11.5
         },
         "15Volts": {
             "max": 15.5,
             "maxOpen": 15.5,
-            "min": 14.5,
-            "minOpen": 14.5
+            "min": 13.5,
+            "minOpen": 13.5
         },
         "24Volts": {
-            "max": 24.5,
-            "maxOpen": 24.5,
-            "min": 23.5,
-            "minOpen": 23.5
+            "max": 25.5,
+            "maxOpen": 25.5,
+            "min": 15,
+            "minOpen": 15
         },
         "24VoltsOxy": {
-            "max": 24.5,
-            "maxOpen": 24.5,
-            "min": 23.5,
-            "minOpen": 23.5
+            "max": 25.5,
+            "maxOpen": 25.5,
+            "min": 15,
+            "minOpen": 15
         },
         "5VoltKon": {
             "max": 5.5,
             "maxOpen": 5.5,
-            "min": 4.5,
+            "min": 4.499999999999998,
             "minOpen": 4.5
         },
         "5Volts": {
-            "max": 5.5,
+            "max": 5.4999999999999964,
             "maxOpen": 5.5,
-            "min": 4.5,
+            "min": 4.499999999999998,
             "minOpen": 4.5
         },
         "battery": {
-            "max": 9,
-            "maxOpen": 9,
-            "min": 8,
-            "minOpen": 8
+            "max": 8.8,
+            "maxOpen": 8.8,
+            "min": 8.2,
+            "minOpen": 8.2
         }
     },
     "workers": [
-        "Beránek"
+        "Beranek",
+        "Troubík"
     ]
 }
