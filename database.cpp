@@ -4,8 +4,9 @@ Database::Database()
 {
     //Create connection to database
     int rc;
-    QString appDirPath = QCoreApplication::applicationDirPath().section('/', 0, -2).append("/.src/zahorovani.db");
-    dbPath = appDirPath.toLocal8Bit();
+    QDir srcDirectory = QDir(QCoreApplication::applicationDirPath());
+    srcDirectory.cd(".src");
+    dbPath = srcDirectory.absoluteFilePath("zahorovani.db").toUtf8();
     rc = sqlite3_open(dbPath.data(), &db);
     if(rc)
     {
@@ -36,10 +37,10 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName)
     }
     //printf("\n");
     QMessageBox::warning(
-        nullptr,    //parent
+        nullptr,                //parent
         "Zahořování zdrojů",    //title
-        retMsg, //text
-        QMessageBox::Ok //button
+        retMsg,                 //text
+        QMessageBox::Ok         //button
     );
     return 0;
 }

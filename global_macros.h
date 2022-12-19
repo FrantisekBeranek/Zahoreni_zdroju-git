@@ -38,9 +38,9 @@ typedef struct
     #define BAT_MAIN_MEAS_COUNT 3
 #else
     #define START_MEAS_COUNT 1
-    #define MAIN_MEAS_COUNT 10
+    #define MAIN_MEAS_COUNT 3
     #define BAT_START_MEAS_COUNT 0
-    #define BAT_MAIN_MEAS_COUNT 3
+    #define BAT_MAIN_MEAS_COUNT 2
 #endif
 
 #endif

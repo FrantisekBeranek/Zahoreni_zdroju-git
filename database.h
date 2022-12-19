@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QString>
 #include <QCoreApplication>
+#include <QDir>
 
 /*
 
