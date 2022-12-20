@@ -69,7 +69,7 @@ toolMenu::toolMenu(QMenuBar* parent = nullptr) : QMenu(parent)
 
     //___Kalibrace___//
     this->actionKalibrace = new QAction("Kalibrace");
-    this->addAction(actionKalibrace);
+    //this->addAction(actionKalibrace);
     connect(actionKalibrace, SIGNAL(triggered()), this, SLOT(calibration()));
 
     this->setTitle("N\303\241stroje");
